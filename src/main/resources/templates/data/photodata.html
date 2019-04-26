@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header">
+    <link rel="stylesheet" type="text/css"
+          href="/css/bootstrap-datetimepicker.min.css"
+            th:href="@{/css/bootstrap-datetimepicker.min.css}">
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="col-sm-12">
+        <div class="ibox">
+            <div class="ibox-body">
+                <div class="fixed-table-toolbar">
+                    <div class="columns pull-left col-md-3 nopadding">
+                        <input id="planId" type="text" class="form-control"
+                               placeholder="活动ID">
+                    </div>
+                    <div class="columns pull-left col-md-3 nopadding">
+                        <input id="planTitle" type="text" class="form-control"
+                               placeholder="活动主题">
+                    </div>
+                    <div class="columns pull-left col-md-3 nopadding">
+                        <input id="planAddress" type="text" class="form-control"
+                               placeholder="活动地点">
+                    </div>
+                    <div class="columns pull-left col-md-3 nopadding">
+                        <input id="id" type="text" class="form-control"
+                               placeholder="详细ID">
+                    </div>
+                    <div class="columns pull-left col-md-3 input-group date" id="datetimepicker1">
+                        <input id="planStartDate" type='text' class="form-control" placeholder="开始时间"/>
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                    <div class="columns pull-left col-md-3 input-group date" id="datetimepicker2" style="padding-left: 20px">
+                        <input id="planEndDate" type='text' class="form-control" placeholder="结束时间"/>
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                    <div class="columns pull-left" style="padding-left: 10px">
+                        <button class="btn btn-primary" onclick="reLoad()">查询</button>
+                    </div>
+                    <div class="columns pull-left" style="padding-left: 10px">
+                        <button class="btn btn-success" onclick="clearData()">重置</button>
+                    </div>
+                </div>
+                <table id="exampleTable" data-mobile-responsive="true">
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div th:include="include :: footer"></div>
+<script type="text/javascript"
+        src="/js/moment-with-locales.min.js"
+        th:src="@{/js/moment-with-locales.min.js}"></script>
+<script type="text/javascript"
+        src="/js/bootstrap-datetimepicker.min.js"
+        th:src="@{/js/bootstrap-datetimepicker.min.js}"></script>
+<script type="text/javascript"
+        src="/js/appjs/data/data.js"
+        th:src="@{/js/appjs/data/photodata.js}"></script>
+</body>
+</html>

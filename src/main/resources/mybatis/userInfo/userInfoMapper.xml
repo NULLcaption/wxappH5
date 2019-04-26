@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxg.weChat.crm.mapper.UserInfoMapper">
+
+    <select id="getUserInfoById" resultType="com.cxg.weChat.crm.pojo.UserInfoDo" parameterType="java.lang.Integer">
+      	select t.login_id   as loginId,
+			   t.mobile,
+			   t.phone mobilephone,
+			   t.email,
+			   t.company,
+			   t.user_state as userState,
+			   t.user_id    as userId,
+			   t.user_name  as userName,
+			   t.org_id     as orgId
+		  from basis.basis_vw_user_psw t
+		 where t.user_id = #{id}
+    </select>
+
+    <select id="getPlanActivityById" parameterType="com.cxg.weChat.crm.pojo.PlanActivityDo"
+            resultType="com.cxg.weChat.crm.pojo.PlanActivityDo">
+        select t.plan_id planId,
+			   t.id,
+			   t.plan_title planTitle,
+			   t.plan_address planAddress,
+			   t.plan_start_date planStartDate,
+			   t.plan_end_date planEndDate,
+			   t.plan_states planStates,
+			   t.plan_code planCode,
+			   t.plan_photo_url planPhotoUrl,
+			   t.plan_explain planExplain,
+			   t.plan_get_explain planGetExplain,
+			   t.plan_qrcode_url planQrcodeUrl
+		 from market.market_tb_plan_activity t where t.id = #{id}
+    </select>
+
+    <select id="getWxUserInfoById" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
+            resultType="java.lang.Integer">
+		select count(*)
+		from market.market_wx_user_info t
+		where t.open_id = #{openId} and t.activity_id = #{activityId}
+	</select>
+
+	<insert id="creatWxUserInfo" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
+		INSERT INTO market.market_wx_user_info
+			(ID,OPEN_ID,NICK_NAME,AVATAR_URL,ACTIVITY_ID,STATUS)
+		VALUES
+			(MARKET.MARKET_SEQ_WX_USER_INFO.nextval,#{openId},#{nickName},#{avatarUrl},#{activityId},#{status})
+	</insert>
+
+	<select id="getPlanActivityList" parameterType="java.lang.String"
+			resultType="com.cxg.weChat.crm.pojo.PlanActivityDo">
+		select case (t.status)
+                 when 'N' then '未参加'
+                 when 'Y' then '已参加'
+  		        		 end status,
+			   t.avatar_url avatarUrl,
+			   p.plan_title planTitle,
+			   p.plan_address planAddress
+		  from market.market_wx_user_info t
+		left join market.market_tb_plan_activity p on p.id = t.activity_id
+		 where t.open_id = #{openId}
+	</select>
+
+	<select id="checkAdminRole" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select t.id
+		 from market.market_tb_plan_activity t where t.plan_code = #{code}
+	</select>
+
+	<insert id="creatWxAdminSignInfo" parameterType="com.cxg.weChat.crm.pojo.WxAdminInfoDo">
+		INSERT INTO market.market_wx_admin_info
+		(ID,OPEN_ID,NICK_NAME,AVATAR_URL,SIGN_ADDRESS,SIGN_DATE)
+		VALUES
+		(MARKET.MARKET_SEQ_WX_ADMIN_INFO.nextval,#{openId},#{nickName},#{avatarUrl},#{signAddress},#{signDate})
+	</insert>
+
+	<select id="getUserInfoByPlanId" parameterType="java.lang.String"
+			resultType="com.cxg.weChat.crm.pojo.PlanActivityDo">
+		select case (t.status)
+                 when 'N' then '未领取'
+                 when 'Y' then '已领取'
+  		        		 end status,
+			   t.avatar_url avatarUrl,
+			   t.nick_name nickName
+		  from market.market_wx_user_info t
+		left join market.market_tb_plan_activity p on p.id = t.activity_id
+		 where t.activity_id = #{planId}
+	</select>
+
+	<select id="findUserInfoStatus" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
+			resultType="java.lang.String">
+		select t.status
+		  from market.market_wx_user_info t
+		  left join market.market_tb_plan_activity p on p.id = t.activity_id
+		 where t.open_id = #{openId} and t.activity_id = #{activityId}
+	</select>
+
+	<update id="updateUserInfoStatus" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
+		update market.market_wx_user_info t
+		set t.status='Y'
+		where t.open_id=#{openId} and t.activity_id=#{activityId}
+	</update>
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cxg.weChat.crm.mapper.AllUserDao">
+
+    <select id="list" resultType="com.cxg.weChat.crm.pojo.AllUsersDo">
+      select t.cust_type  as custType,
+             t.passwd     as passWd,
+             t.login_id   as loginId,
+             t.mobile,
+             t.phone,
+             t.email,
+             t.user_state as userState,
+             t.user_id    as userId,
+             t.user_name  as userName,
+             t.hq_sign    as hqSign,
+             t.org_id     as orgId,
+             t.isoffice_sign as isOffice,
+             t.expiredpsw as expiredpsw,
+             t.kunnr_sign as kunnrSign
+          from basis.basis_vw_user_psw t
+         where (t.login_id = #{username} or
+             (t.mobile = #{username} and t.cust_type = 'X') or
+             (t.phone = #{username} and t.cust_type = 'X'))
+           and t.user_state in ('S', 'Y')
+    </select>
+
+    <select id="getUserById" resultType="com.cxg.weChat.crm.pojo.AllUsersDo"
+            parameterType="java.lang.String">
+        select t.cust_type  as custType,
+             t.passwd     as passWd,
+             t.login_id   as loginId,
+             t.mobile,
+             t.phone,
+             t.email,
+             t.user_state as userState,
+             t.user_id    as userId,
+             t.user_name  as userName,
+             t.hq_sign    as hqSign,
+             t.org_id     as orgId,
+             t.isoffice_sign as isOffice,
+             t.expiredpsw as expiredpsw,
+             t.kunnr_sign as kunnrSign
+          from basis.basis_vw_user_psw t
+         where t.user_id = #{userId}
+           and t.user_state in ('S', 'Y')
+    </select>
+
+</mapper>

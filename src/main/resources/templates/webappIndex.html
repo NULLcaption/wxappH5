@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>活动详情</title>
+</head>
+<head th:include="include :: header"></head>
+<script type="text/javascript">
+    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+        WeixinJSBridge.call('hideOptionMenu');
+    });
+</script>
+<body class="gray-bg">
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-sm-12" style="min-height: 0px">
+            <div class="ibox-content">
+                <input id="id" name="id" type="hidden" th:value="${planActivityDo.id}">
+                <input id="planId" name="planId" type="hidden" th:value="${planActivityDo.planId}">
+                <input id="openId" name="openId" type="hidden" th:value="${planActivityDo.openId}">
+                <div>
+                    <div class="col-sm-12">
+                        <p><img class="img-responsive center-block" th:src="${planActivityDo.planPhotoUrl}" /></p>
+                    </div>
+                </div>
+                <div class="container-fluid">
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <blockquote style="margin: 0 0 0">
+                                <p style="color: #e28b41">
+                                    <span th:text="${planActivityDo.planTitle}"></span>
+                                </p>
+                                <small style="color: #030303">
+                                    <span th:text="${planActivityDo.planAddress}"></span>
+                                </small>
+                            </blockquote>
+                        </div>
+                        <div class="span12">
+                            <address style="color: #8a1f11; margin: 0 0 0">
+                                <label class="col-sm-12 control-label">活动时间:</label>
+                                <span th:text="${planActivityDo.planStartDate}"></span>
+                                到
+                                <span th:text="${planActivityDo.planEndDate}"></span>
+                            </address>
+                        </div>
+                    </div>
+                </div>
+                <!--<div>-->
+                    <!--<label class="col-sm-12 control-label">活动类型:</label>-->
+                    <!--<span th:if="${planActivityDo.planStates == '0'}">简单派发</span>-->
+                    <!--<span th:if="${planActivityDo.planStates == '1'}">集赞派发</span>-->
+                    <!--<span th:if="${planActivityDo.planStates == '2'}">分享派发</span>-->
+                <!--</div>-->
+                <div class="panel panel-default" style="margin-bottom: 0;padding-left: 15px;panel-heading:#FFFFFF !important; border-color: #FFFFFF;">
+                    <div class="panel-heading">
+                        <h4 class="panel-title" style="color: #030303">活动说明</h4>
+                    </div>
+                    <div class="panel-body">
+                        <span th:text="${planActivityDo.planExplain}"></span>
+                    </div>
+                    <div class="panel-heading">
+                        <h4 class="panel-title" style="color: #030303;">领取说明</h4>
+                    </div>
+                    <div class="panel-body">
+                        <span th:text="${planActivityDo.planGetExplain}"></span>
+                    </div>
+                </div>
+                <div class="text-center" style="color: #fe2439">
+                    <p style="margin: 0 0 0;">请到现场管理员处确认领取</p>
+                </div>
+                <div class="text-right form-group">
+                    <button type="button"
+                            class="btn btn-warning btn-lg btn-block"
+                            style="color: #030303"
+                            onclick="save(1)">确认领取</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script src="/js/appjs/webapp.js" th:src="@{/js/appjs/webapp.js}"></script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>weChatDo</title>
+    <link th:href="@{/css/bootstrap.min.css}" href="/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/font-awesome.css?v=4.4.0}" href="/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link th:href="@{/css/animate.css}" href="/css/animate.css" rel="stylesheet">
+    <link th:href="@{/css/login.css}" href="/css/login.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html"/>
+    <![endif]-->
+    <script>
+        if (window.top !== window.self) {
+            window.top.location = window.location;
+        }
+    </script>
+</head>
+<body class="signin">
+<div class="signinpanel">
+    <div class="row">
+        <div class="col-sm-7">
+            <div class="signin-info">
+                <div class="logopanel m-b">
+                    <h1>WECHAT PROJECT</h1>
+                </div>
+                <div class="m-b"></div>
+                <h3>
+                    WELCOME <strong>CHENEY MASTER SYSTEM FOR WECHAT PROJECT</strong>
+                </h3>
+                <ul class="m-b">
+                    <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i>Simple</li>
+                    <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i>Nuclear</li>
+                    <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i>Niewpoint</li>
+                    <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i>Experience</li>
+                    <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i>Grow Up</li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <form id="signupForm">
+                <h3 class="text-center" style="color: #ffffff;">USER SING IN</h3>
+                <p class="m-t-md text-center" style="color: #ffffff;">WECHAT PROJECT SYSTEM</p>
+                <input type="text" name="username" class="form-control uname"/>
+                <input type="password" name="password"
+                       class="form-control pword m-b"/>
+                <a id="login" class="btn btn-login btn-block">SING IN</a>
+                <!--按钮模块-->
+                <div class="outside-login">
+                    <div class="outside-login-tit">
+                        <span>CODING LINK</span>
+                    </div>
+                    <div class="outside-login-cot">
+                        <a class="outside-login-btn wxoa actived git J-btnSwitchLoginType" target="_Blank"
+                           href="http://exp.zjxpp.com:8186/basisPlatform/">
+                            <em><i class="fa fa-bank"></i></em>
+                            <span style="color: #ffffff;">EXP SYSTEM</span>
+                        </a>
+                        <a class="outside-login-btn wxoa actived git J-btnSwitchLoginType" target="_Blank"
+                           href="http://oa.zjxpp.com:8101/login/Login.jsp">
+                            <em><i class="fa fa-cogs"></i></em>
+                            <span style="color: #ffffff;">OA SYSTEM</span>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="signup-footer">
+        <div class="pull-left">CHENEY MASTER SYSTEM FOR WECHAT SYSTEM</div>
+    </div>
+</div>
+<script th:inline="javascript"> var ctx = [[@{/}]] ; </script>
+<!-- 全局js -->
+<script src="/js/jquery.min.js?v=2.1.4" th:src="@{/js/jquery.min.js?v=2.1.4}"></script>
+<script src="/js/bootstrap.min.js?v=3.3.6" th:src="@{/js/bootstrap.min.js?v=3.3.6}"></script>
+
+<!-- 自定义js -->
+<script src="/js/content.js?v=1.0.0" th:src="@{/js/content.js?v=1.0.0}"></script>
+
+<!-- jQuery Validation plugin javascript-->
+<script src="/js/ajax-util.js" th:src="@{/js/ajax-util.js}"></script>
+<script src="/js/plugins/validate/jquery.validate.min.js" th:src="@{/js/plugins/validate/jquery.validate.min.js}"></script>
+<script src="/js/plugins/validate/messages_zh.min.js" th:src="@{/js/plugins/validate/messages_zh.min.js}"></script>
+<script src="/js/plugins/layer/layer.min.js" th:src="@{/js/plugins/layer/layer.min.js}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#login").on('click',function(){$("#signupForm").submit();});
+        validateRule();
+    });
+
+    $.validator.setDefaults({
+        submitHandler: function () {
+            login();
+        }
+    });
+
+    function login() {
+        $.ajax({
+            type: "POST",
+            url: ctx+"login",
+            data: $('#signupForm').serialize(),
+            success: function (r) {
+                if (r.code == 0) {
+                    var index = layer.load(1, {
+                        shade: [0.1,'#fff'] //0.1透明度的白色背景
+                    });
+                    layer.msg(r.msg);
+                    parent.location.href = '/index';
+                } else {
+                    layer.msg(r.msg);
+                }
+            }
+        });
+    }
+
+    function validateRule() {
+        var icon = "<i class='fa fa-times-circle'></i> ";
+        $("#signupForm").validate({
+            rules: {
+                username: {
+                    required: true
+                },
+                password: {
+                    required: true
+                }
+            },
+            messages: {
+                username: {
+                    required: icon + "please input your sign name"
+                },
+                password: {
+                    required: icon + "please input your sign password"
+                }
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

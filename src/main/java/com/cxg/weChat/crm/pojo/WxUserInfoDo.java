@@ -17,6 +17,15 @@ public class WxUserInfoDo implements Serializable{
     private String avatarUrl;
     private String activityId;
     private String status;
+    private String isTransmit;
+
+    public String getIsTransmit() {
+        return isTransmit;
+    }
+
+    public void setIsTransmit(String isTransmit) {
+        this.isTransmit = isTransmit;
+    }
 
     public String getId() {
         return id;
@@ -75,6 +84,7 @@ public class WxUserInfoDo implements Serializable{
                 ", avatarUrl='" + avatarUrl + '\'' +
                 ", activityId='" + activityId + '\'' +
                 ", status='" + status + '\'' +
+                ", isTransmit='" + isTransmit + '\'' +
                 '}';
     }
 }

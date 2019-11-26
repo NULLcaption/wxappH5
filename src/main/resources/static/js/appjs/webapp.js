@@ -12,6 +12,7 @@ $.validator.setDefaults({
         save(1);
     }
 });
+//确认领取
 function save(status) {
     $.ajax({
         type : 'POST',
@@ -20,7 +21,7 @@ function save(status) {
             "planId" : $("#planId").val(),
             "openId" : $("#openId").val()
         },
-        url : prefix + '/submit',
+        url : prefix + '/submit1',
         success : function(r) {
             if (r.code == 0) {
                 layer.msg("亲！您已领取成功！");

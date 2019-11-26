@@ -19,7 +19,7 @@ function load() {
         .bootstrapTable(
         {
             method: 'get', // 服务器数据的请求方式 get or post
-            url: prefix + "/dataList", // 服务器数据的加载地址
+            url: prefix + "/proPhotoDataList", // 服务器数据的加载地址
             // showRefresh : true,
             // showToggle : true,
             showColumns: true,
@@ -46,13 +46,10 @@ function load() {
                     // 说明：传入后台的参数包括offset开始索引，limit步长，sort排序列，order：desc或者,以及所有列的键值对
                     limit: params.limit,//页面大小
                     offset: params.offset,//页码
-                    planId: $('#planId').val(),
-                    id: $('#id').val(),
-                    planTitle: $('#planTitle').val(),
                     planAddress: $('#planAddress').val(),
-                    status: $('#status').val(),
                     planStartDate: $('#planStartDate').val(),
-                    planEndDate: $('#planEndDate').val()
+                    planEndDate: $('#planEndDate').val(),
+                    userName: $('#userName').val()
                 };
             },
             // //请求服务器数据时，你可以通过重写参数的方式添加一些额外的参数，例如 toolbar 中的参数 如果
@@ -63,60 +60,69 @@ function load() {
             // 返回false将会终止请求
             columns: [
                 {
-                    visible: false,
-                    field: 'id',
-                    title: '详细ID'
-                },
-                {
-                    field: 'planId',
-                    title: '活动ID'
-                },
-                {
-                    field: 'planTitle',
-                    title: '活动标题'
-                },
-                {
                     field: 'planAddress',
                     title: '活动地址'
                 },
                 {
-                    field: 'planStartDate',
-                    title: '活动开始时间'
+                    field: 'loginId',
+                    title: '用户ID'
                 },
                 {
-                    field: 'planEndDate',
-                    title: '活动结束时间'
+                    field: 'userName',
+                    title: '用户姓名'
                 },
                 {
-                    field: 'openId',
-                    title: 'openId'
-                },
-                {
-                    field: 'nickName',
-                    title: '微信昵称'
-                },
-                {
-                    field: 'avatarUrl',
-                    title: '微信头像',
-                    formatter: function (value, row, index) {
-                        var avatarUrl = row.avatarUrl;
-                        if (avatarUrl != null) {
-                            return '<a class = "view"  href="javascript:void(0)"><img style="width:30px;height:30px;"  src="' + avatarUrl + '" /></a>';
+                    field: 'userRole',
+                    title: '人员角色',
+                    formatter: function (value) {
+                        if (value == "G") {
+                            return "导购";
+                        } else if (value == "L") {
+                            return "理货员";
+                        } else if (value == "D") {
+                            return "督导";
                         }
-                        return '';
                     }
                 },
                 {
-                    field: 'status',
-                    title: '是否状态'
+                    field: 'photoUrl',
+                    title: '现场照片',
+                    formatter : function(value, row, index) {
+                        var photoUrl = row.photoUrl;
+                        if (photoUrl != null ) {
+                            return '<a class = "view"  href="javascript:void(0)"><img style="width:50px;height:50px;"  src="'+photoUrl+'" /></a>';
+                        }
+                        return '';
+                    },
+                    events: 'operateEvents'//定义点击之后放大图片的事件
                 },
                 {
-                    field: 'isTransmit',
-                    title: '是否转发'
+                    field: 'creartDate',
+                    title: '上传时间'
                 }
             ]
         });
 }
+
+/**
+ * 图片放大器
+ * @type {{click .view: Function}}
+ */
+window.operateEvents = {
+    'click .view': function (e, value, row, index) {
+        var img ='<img style="width:100%; height:100%;" src="'+row.photoUrl+'"/>';
+        layer.open({
+            type: 1,
+            title: false,
+            closeBtn: 0,
+            area: [375 + 'px', 667 +'px'],
+            skin: 'layui-layer-nobg', //没有背景色
+            shadeClose: true,
+            content: img
+        });
+    }
+};
+
 /**
  * 查询
  */
@@ -127,19 +133,17 @@ function reLoad() {
  * 重置
  */
 function clearData() {
-    $('#planId').val(''),
-        $('#id').val(''),
-        $('#planTitle').val(''),
-        $('#planAddress').val(''),
-        $('#status').val(''),
+    $('#planAddress').val(''),
         $('#planStartDate').val(''),
-        $('#planEndDate').val('')
+        $('#planEndDate').val(''),
+        $('#userName').val()
 }
 /**
  * 导出数据
  */
 function downloadData() {
-    window.open(prefix + '/downloadData?planId=' + $('#planId').val() + '&id=' + $('#id').val()
-    + '&planTitle=' + $('#planTitle').val() + '&planAddress=' + $('#planAddress').val() + '&status=' + $('#status').val()
-    + '&planStartDate=' + $('#planStartDate').val() + '&planEndDate=' + $('#planEndDate').val());
+    window.open(prefix + '/downloadSiginData?planAddress=' + $('#planAddress').val()
+    + '&planStartDate=' + $('#planStartDate').val()
+    + '&planEndDate=' + $('#planEndDate').val()
+    + '&userName=' + $('#userName').val());
 }

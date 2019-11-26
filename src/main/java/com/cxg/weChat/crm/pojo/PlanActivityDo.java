@@ -31,6 +31,15 @@ public class PlanActivityDo implements Serializable {
 	private String avatarUrl;
 	private String NickName;
 	private String openId;
+	private String isTransmit;
+
+	public String getIsTransmit() {
+		return isTransmit;
+	}
+
+	public void setIsTransmit(String isTransmit) {
+		this.isTransmit = isTransmit;
+	}
 
 	public String getOpenId() {
 		return openId;

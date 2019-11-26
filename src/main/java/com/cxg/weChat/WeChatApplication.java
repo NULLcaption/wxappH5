@@ -16,12 +16,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class WeChatApplication  extends SpringBootServletInitializer {
 	public static void main(String[] args) {
 		SpringApplication.run(WeChatApplication.class, args);
-		System.out.println("\n" +
-				" ______                    _   ______            \n" +
-				"|_   _ \\                  / |_|_   _ `.          \n" +
-				"  | |_) |   .--.    .--. `| |-' | | `. \\  .--.   \n" +
-				"  |  __'. / .'`\\ \\/ .'`\\ \\| |   | |  | |/ .'`\\ \\ \n" +
-				" _| |__) || \\__. || \\__. || |, _| |_.' /| \\__. | \n" +
-				"|_______/  '.__.'  '.__.' \\__/|______.'  '.__.'  ");
+		System.out.println("__________.___  ________________________________________\n" +
+				"\\______   \\   |/  _____/\\______   \\_   _____/\\_   _____/\n" +
+				" |    |  _/   /   \\  ___ |    |  _/|    __)_  |    __)_ \n" +
+				" |    |   \\   \\    \\_\\  \\|    |   \\|        \\ |        \\\n" +
+				" |______  /___|\\______  /|______  /_______  //_______  /\n" +
+				"        \\/            \\/        \\/        \\/         \\/ ");
 	}
 }

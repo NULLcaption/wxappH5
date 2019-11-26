@@ -1,15 +1,24 @@
 package com.cxg.weChat.crm.controller;
 
-import com.cxg.weChat.core.utils.JSONUtils;
-import com.cxg.weChat.core.utils.R;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.cxg.weChat.core.config.Constant;
+import com.cxg.weChat.core.utils.*;
 import com.cxg.weChat.crm.pojo.PlanActivityDo;
 import com.cxg.weChat.crm.pojo.UserInfoDo;
 import com.cxg.weChat.crm.pojo.WxUserInfoDo;
 import com.cxg.weChat.crm.service.UserInfoService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import me.chanjar.weixin.common.bean.WxJsapiSignature;
+import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
+import me.chanjar.weixin.open.api.WxOpenService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +30,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description: 后台基础类
@@ -39,8 +46,107 @@ public class userInfoController {
     @Autowired
     UserInfoService userInfoService;
 
-    public static String TEST_URL = "http://exptest.zjxpp.com:7186";
-    public static String ONLINE_URL = "http://exp.zjxpp.com:8186";
+    @Autowired
+    WxOpenService wxOpenService;
+
+    @Autowired
+    HttpSession session;
+
+    @Autowired
+    RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    ValueOperations<String, Object> valueOperations;
+
+    /**jsapi_ticket*/
+    private static String jsapiTicket;
+    /**jsapi_ticket过期时间*/
+    private static long jsapiTicketExpires;
+
+    /**
+     * @Description 获取微信JS授权
+     * @Author xg.chen
+     * @Date 10:10 2019/8/29
+     **/
+    @PostMapping("/config")
+    @ResponseBody
+    public String configWxJs(@RequestParam("appId") String appId,@RequestParam("url") String url,HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        Map<String, Object> configValue = new HashMap<String, Object>();
+        /**设置jsapiTicket*/
+        int setTicketRes = setJsapiTicket(request,appId);
+        if( setTicketRes == 0 || jsapiTicket == null){
+            logger.debug("get jsapiTicket failed!");
+            return null;
+        }
+        String jsapi_ticket = jsapiTicket; //获取jsapi_ticket
+        long timestamp = System.currentTimeMillis() / 1000;
+        String nonceStr = RandomStr.createRandomString(16);
+        /**加密字符串*/
+        String str = "jsapi_ticket="+ jsapi_ticket +"&noncestr="+ nonceStr +"&timestamp="+ timestamp +"&url="+url;
+        String signature = Sha1.encode(str);
+        logger.debug("signature:" + signature);
+
+        configValue.put("signature", signature);
+        configValue.put("nonceStr", nonceStr);
+        configValue.put("timestamp", timestamp);
+
+        String config = JSON.toJSONString(configValue);
+        return config;
+    }
+
+    /**
+     * @Description 设置jsapiTicket
+     * @Author xg.chen
+     * @Date 13:32 2019/8/29
+     **/
+    private int setJsapiTicket(HttpServletRequest request,String appid){
+        long curTime = System.currentTimeMillis();
+        if(curTime < jsapiTicketExpires && jsapiTicket != null){
+            logger.debug("jsapiTicket not timeout,don't try again!");
+            return 1;
+        }
+        //获取access_token
+        Map<String, Object> accessTokenRes = getAccessToken();
+        if(accessTokenRes == null){
+            logger.debug("3 get accessToken failed!");
+            return 0;
+        }
+        String accessToken = (String) accessTokenRes.get("access_token");
+        try{
+            String res = HttpUtil.get("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi");
+            JSONObject result = JSON.parseObject(res);
+            if(result.getString("errmsg").equals("ok")){
+                jsapiTicket = result.getString("ticket");
+                jsapiTicketExpires = curTime + 7200*1000;
+            }
+        }catch (Exception e){
+            logger.debug("4 error on get JsapiTicket" + e);
+            return 0;
+        }
+        return 1;
+    }
+
+    /**
+     * @Description token就重新获取
+     * @Author xg.chen
+     * @Date 13:41 2019/8/29
+     **/
+    private Map<String, Object> getAccessToken () {
+        String url = Constant.GET_URL+"&appid="+Constant.M_APP_ID+"&secret="+Constant.M_APP_SERCET;
+        //http发送请求
+        String data = HttpUtil.get(url);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> json = null;
+        try{
+            json = mapper.readValue(data, Map.class);
+            logger.debug("json{}：",json);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
+    }
+
 
     /**
      * @Description 检查这个人是不是领取过了
@@ -84,66 +190,141 @@ public class userInfoController {
      * @Date 14:07 2019/3/13
      */
     @GetMapping("/webappIndex/{QRCode}")
-    public String webapp(@PathVariable(value = "QRCode", required = false) String QRCode, Model model, HttpServletRequest request) throws ParseException, UnsupportedEncodingException {
+    public String webapp(@PathVariable(value = "QRCode", required = false) String QRCode,
+                         HttpServletRequest request,
+                         Model model)
+            throws UnsupportedEncodingException, ParseException {
         //传入的参数
         String[] strs = QRCode.split(",");
-        String id = strs[0].toString();
-        String planId = strs[1].toString();
-//        String openId = strs[2].toString();
-        HttpSession session = request.getSession();
+        String id = strs[0].toString().trim();
+        String planId = strs[1].toString().trim();
+        //获取缓存中的openId
+        session = request.getSession();
         String openId = (String) session.getAttribute("openId");
-        logger.debug("session openid---------------->" + openId);
-        if (null == openId) {
+//        测试数据
+//        String openId = "oVgr8wUxM2JWhdcEIiNbBhY1ppEA";
+        //不是扫码进来的
+        if(StringUtils.isEmpty(openId)) {
             return "webappError/error_1";
         }
-        //从后台获取数据
-        PlanActivityDo planActivityDo = new PlanActivityDo();
-        planActivityDo.setId(id);
-        planActivityDo.setPlanId(planId);
-        planActivityDo = userInfoService.getPlanActivityById(planActivityDo);
-        String startDate = planActivityDo.getPlanStartDate();
-        String endDate = planActivityDo.getPlanEndDate();
+        //获取活动数据
+        PlanActivityDo planActivityDo = getPlanActivityData(id, planId);
+        //控制活动的时间
+        String plamDate = getPlanDate(planActivityDo);
+        if ("1".equals(plamDate)) {
+            //活动未开始
+            return "webappError/unstart";
+        }
+        if ("2".equals(plamDate)) {
+            //活动已结束
+            return "webappError/started";
+        }
+        //活动正常执行
+        WxUserInfoDo wxUserInfoDo = new WxUserInfoDo();
+        wxUserInfoDo.setOpenId(openId);
+        wxUserInfoDo.setActivityId(id);
+        WxUserInfoDo wxUserInfo = userInfoService.findUserInfoStatus(wxUserInfoDo);
+        if (null != wxUserInfo) {
+            //是否参加
+            if (wxUserInfo.getStatus().equals("N")) {
+                if (planActivityDo != null) {
+                    String[] string = planActivityDo.getPlanPhotoUrl().split(",");
+                    planActivityDo.setPlanPhotoUrl(string[0]);
+                }
+                planActivityDo.setOpenId(openId);
+                model.addAttribute("planActivityDo", planActivityDo);
+                return "webappIndex";
+            }
+        }
+        return "webappError/error";
+    }
+
+    /**
+     * @Description 获取活动数据
+     * 先去redis去获取，如果没有，就去数据库中去去获取
+     * @Author xg.chen
+     * @Date 14:40 2019/11/25
+    **/
+    public PlanActivityDo getPlanActivityData(String id, String planId) {
+        //redis中获取
+        //这里的redis的key值是Object_id的key，保证多数据的唯一性
+        PlanActivityDo redisDo = (PlanActivityDo) valueOperations.get("planActivityDo_"+id);
+        if (redisDo==null) {
+            PlanActivityDo planActivityDo = new PlanActivityDo();
+            //在数据中获取，并保存在redis中
+            planActivityDo.setId(id);
+            planActivityDo.setPlanId(planId);
+            planActivityDo = userInfoService.getPlanActivityById(planActivityDo);
+            valueOperations.set("planActivityDo_"+id, planActivityDo);
+            return planActivityDo;
+        }
+        return redisDo;
+    }
+
+    /**
+     * @Description 活动时间控制
+     * @Author xg.chen
+     * @Date 14:11 2019/11/25
+    **/
+    public String getPlanDate(PlanActivityDo planActivityDo) throws ParseException {
+        //控制活动的时间
+        String startDate = planActivityDo.getPlanStartDate();//活动开始时间
+        String endDate = planActivityDo.getPlanEndDate();//活动结束时间
+        //这里一长串是因为取出来的数据中的汉字是乱码
         String y=startDate.substring(4, 5);
         String m=startDate.substring(7,8);
         String d=startDate.substring(10,11);
         String ymd="yyyy"+y+"MM"+m+"dd"+d;
+        //格式化开始时间
         SimpleDateFormat sdf = new SimpleDateFormat(ymd);
         Date utilDate = sdf.parse(startDate);
+        //格式化结束时间
         SimpleDateFormat sdf1 = new SimpleDateFormat(ymd);
         Date utilDate1 = sdf1.parse(endDate);
+        //取当前的服务器时间
         String[] strNow = new SimpleDateFormat("yyyy-MM-dd").format(new Date()).toString().split("-");
         Integer year = Integer.parseInt(strNow[0]);
         Integer month = Integer.parseInt(strNow[1]);
         Integer day = Integer.parseInt(strNow[2]);
+        //格式化当前时间
         String dateNow = year+y+month+m+day+d;
         SimpleDateFormat sdf3 = new SimpleDateFormat(ymd);
         Date utilDate2 = sdf3.parse(dateNow);
+        //开始时间
         long a = utilDate.getTime();
+        //结束时间
         long b = utilDate1.getTime();
+        //当前时间
         long c = utilDate2.getTime();
         if (c < a) {
-            return "webappError/unstart";
+            //活动未开始
+            return "1";
         } else if (c > b) {
-            return "webappError/started";
-        } else {
-            //领取成功以后不能在进入活动主界面
-            WxUserInfoDo wxUserInfoDo = new WxUserInfoDo();
-            wxUserInfoDo.setOpenId(openId);
-            wxUserInfoDo.setActivityId(id);
-            String status = userInfoService.findUserInfoStatus(wxUserInfoDo);
-            if (null != status) {
-                if (status.equals("N")) {
-                    if (planActivityDo != null) {
-                        String[] string = planActivityDo.getPlanPhotoUrl().split(",");
-                        planActivityDo.setPlanPhotoUrl(string[0]);
-                    }
-                    planActivityDo.setOpenId(openId);
-                    model.addAttribute("planActivityDo", planActivityDo);
-                    return "webappIndex";
-                }
-            }
+            //活动已结束
+            return "2";
         }
-        return "webappError/error";
+        return "0";
+    }
+
+    /**
+     * @Description 确认领取
+     * @Author xg.chen
+     * @Date 14:04 2019/8/3066
+     **/
+    @PostMapping("/submit1")
+    @ResponseBody
+    public R Activities2Confirm1(@RequestParam("id") String id,
+                                 @RequestParam("planId") String planId,
+                                 @RequestParam("openId") String openId,
+                                 HttpServletRequest request) {
+        WxUserInfoDo wxUserInfoDo = new WxUserInfoDo();
+        wxUserInfoDo.setOpenId(openId);
+        wxUserInfoDo.setActivityId(id);
+        int num = userInfoService.updateUserInfoStatus(wxUserInfoDo);
+        if (num > 0) {
+            return R.ok();
+        }
+        return R.error();
     }
 
     /**
@@ -156,119 +337,4 @@ public class userInfoController {
         return "webappError/success";
     }
 
-    /**
-     * 转发后用户没有扫面二维码
-     *
-     * @return
-     */
-    @GetMapping("/notConcern/{QRCode}")
-    public String notConcern(@PathVariable(value = "QRCode", required = false) String QRCode, Model model) {
-        //传入的参数
-        String[] strs = QRCode.split(",");
-        String id = strs[0].toString();
-        String planId = strs[1].toString();
-        //从后台获取数据
-        PlanActivityDo planActivityDo = new PlanActivityDo();
-        planActivityDo.setId(id);
-        planActivityDo.setPlanId(planId);
-        planActivityDo = userInfoService.getPlanActivityById(planActivityDo);
-        planActivityDo.setPlanQrcodeUrl(TEST_URL + planActivityDo.getPlanQrcodeUrl());
-        model.addAttribute("planActivityDo", planActivityDo);
-        return "webappError/notConcern";
-    }
-
-    /**
-     * 确认领取
-     *
-     * @param id
-     * @param planId
-     * @param openId
-     * @return
-     */
-    @PostMapping("/submit")
-    @ResponseBody
-    public R Activities2Confirm(@RequestParam("id") String id,
-                                @RequestParam("planId") String planId,
-                                @RequestParam("openId") String openId) {
-        WxUserInfoDo wxUserInfoDo = new WxUserInfoDo();
-        wxUserInfoDo.setOpenId(openId);
-        wxUserInfoDo.setActivityId(id);
-        String status = userInfoService.findUserInfoStatus(wxUserInfoDo);
-        if (null != status) {
-            //用户领取领取过了，提示不能再领取了
-            if (status.equals("Y")) {
-                return R.error();
-            } else {//用户没有领取，提示领取成功
-                int num = userInfoService.updateUserInfoStatus(wxUserInfoDo);
-                if (num > 0) {
-                    return R.ok();
-                }
-            }
-        }
-        return R.error();
-    }
-
-    /**
-     * @Description 获取活动详细页面
-     * @Author xg.chen
-     * @Date 14:05 2019/3/13
-     */
-    @GetMapping("/plan")
-    @ResponseBody
-    public String getPlanActivityById(String QRCode) {
-        //处理获取到的二维码
-        String[] strs = QRCode.split("-");
-        String id = strs[0].toString();
-        String planId = strs[1].toString();
-        //从后台获取数据
-        PlanActivityDo planActivityDo = new PlanActivityDo();
-        planActivityDo.setId(id);
-        planActivityDo.setPlanId(planId);
-
-        planActivityDo = userInfoService.getPlanActivityById(planActivityDo);
-        if (planActivityDo != null) {
-            if (planActivityDo.getPlanStates().equals("0")) {
-                planActivityDo.setPlanStates("简单派送");
-            }
-            if (planActivityDo.getPlanStates().equals("1")) {
-                planActivityDo.setPlanStates("集赞派送");
-            }
-            if (planActivityDo.getPlanStates().equals("2")) {
-                planActivityDo.setPlanStates("分享派送");
-            }
-            String[] string = planActivityDo.getPlanPhotoUrl().split(",");
-            planActivityDo.setUrls(string);
-        }
-        String json = JSONUtils.beanToJson(planActivityDo);
-
-        return json;
-    }
-
-    /**
-     * @Description PC端首页
-     * @Author xg.chen
-     * @Date 14:05 2019/3/13
-     */
-    @GetMapping("/index")
-    public String index(Model model) {
-        UserInfoDo userInfoDo = userInfoService.getUserInfoById(93890);
-        model.addAttribute("userId", userInfoDo.getUserId());
-        model.addAttribute("userName", userInfoDo.getUserName());
-        model.addAttribute("phone", userInfoDo.getMobilephone());
-        model.addAttribute("address", userInfoDo.getAddress());
-        return "index";
-    }
-
-    /**
-     * @Description 测试页面
-     * @Author xg.chen
-     * @Date 14:06 2019/3/13
-     */
-    @RequestMapping("/userInfoById")
-    @ResponseBody
-    public String userInfoById(Model model) {
-        UserInfoDo userInfoDo = userInfoService.getUserInfoById(93890);
-        String json = JSONUtils.beanToJson(userInfoDo);
-        return json;
-    }
 }

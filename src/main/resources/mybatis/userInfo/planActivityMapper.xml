@@ -17,7 +17,7 @@
         t.sign_address signAddress,
         t.sign_date signDate
         from market.market_wx_admin_info t
-        left join market.market_tb_plan_activity p on t.activity_id = p.id
+        left join market.market_tb_plan_activity p on t.activity_id = to_char(p.id)
         <where>
             <if test="planId != null and planId != ''">and p.plan_id = #{planId}</if>
             <if test="id != null and id != ''">and p.id = #{id}</if>
@@ -43,7 +43,7 @@
     <select id="countPlanAdminData" resultType="java.lang.Integer">
         select COUNT (*)
         from market.market_wx_admin_info t
-        left join market.market_tb_plan_activity p on t.activity_id = p.id
+        left join market.market_tb_plan_activity p on t.activity_id = to_char(p.id)
         <where>
             <if test="planId != null and planId != ''">and p.plan_id = #{planId}</if>
             <if test="id != null and id != ''">and p.id = #{id}</if>
@@ -72,7 +72,13 @@
         '未参加'
         when 'Y' then
         '已参加'
-        end status
+        end status,
+        case (t.is_transmit)
+        when 'N' then
+        '未转发'
+        when 'Y' then
+        '已转发'
+        end isTransmit
         from market.market_wx_user_info t
         left join market.market_tb_plan_activity p on t.activity_id = p.id
         <where>
@@ -113,6 +119,74 @@
             <if test="status == null and status == ''">and t.status in ('N','Y')</if>
             <if test="status == '已参加'">and t.status = 'Y'</if>
             <if test="status == '未参加'">and t.status = 'N'</if>
+        </where>
+    </select>
+
+    <select id="getPlanPhotoList" resultType="com.cxg.weChat.crm.pojo.WxPlanPhotoDo">
+        select *
+        from (select row_.*, rownum rownum_
+        from (select p.id,
+        p.plan_id planId,
+        p.plan_title planTitle,
+        p.plan_address planAddress,
+        p.plan_start_date planStartDate,
+        p.plan_end_date planEndDate,
+        tt.open_id openId,
+        tt.nick_name nickName,
+        tt.avatar_url avatarUrl,
+        pp.photo_url photoUrl,
+        pp.creart_date creartDate
+        from market.markrt_wx_plan_photo pp
+        left join (select distinct (t.activity_id) activity_id,
+        t.open_id,
+        t.nick_name,
+        t.avatar_url
+        from market.market_wx_admin_info t) tt on tt.open_id =
+        pp.openid
+        and tt.activity_id =
+        pp.activity_id
+        left join market.market_tb_plan_activity p on tt.activity_id = p.id
+        <where>
+            <if test="planId != null and planId != ''">and p.plan_id = #{planId}</if>
+            <if test="id != null and id != ''">and p.id = #{id}</if>
+            <if test="planTitle != null and planTitle != ''">and p.plan_title LIKE '%${planTitle}%'</if>
+            <if test="planAddress != null and planAddress != ''">and p.plan_address LIKE '%${planAddress}%'</if>
+            <if test="planStartDate != null and planStartDate != ''">and p.plan_start_date = #{planStartDate}</if>
+            <if test="planEndDate != null and planEndDate != ''">and p.plan_end_date = #{planEndDate}</if>
+            <if test="planEndDate == null and planEndDate == ''">and t.status in ('N','Y')</if>
+        </where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+            <otherwise>
+                order by pp.creart_date desc
+            </otherwise>
+        </choose>
+        ) row_
+        where rownum &lt;= ${limit})
+        where rownum_ &gt; ${offset}
+    </select>
+
+    <select id="countPlanPhotoData" resultType="java.lang.Integer">
+        select COUNT (*)
+        from market.markrt_wx_plan_photo pp
+        left join (select distinct (t.activity_id) activity_id,
+        t.open_id,
+        t.nick_name,
+        t.avatar_url
+        from market.market_wx_admin_info t) tt on tt.open_id =
+        pp.openid
+        and tt.activity_id =
+        pp.activity_id
+        left join market.market_tb_plan_activity p on tt.activity_id = p.id
+        <where>
+            <if test="planId != null and planId != ''">and p.plan_id = #{planId}</if>
+            <if test="id != null and id != ''">and p.id = #{id}</if>
+            <if test="planTitle != null and planTitle != ''">and p.plan_title LIKE '%${planTitle}%'</if>
+            <if test="planAddress != null and planAddress != ''">and p.plan_address LIKE '%${planAddress}%'</if>
+            <if test="planStartDate != null and planStartDate != ''">and p.plan_start_date = #{planStartDate}</if>
+            <if test="planEndDate != null and planEndDate != ''">and p.plan_end_date = #{planEndDate}</if>
         </where>
     </select>
 

@@ -3,6 +3,7 @@ package com.cxg.weChat.crm.mapper;
 import com.cxg.weChat.core.utils.Query;
 import com.cxg.weChat.crm.pojo.PlanActivityDo;
 import com.cxg.weChat.crm.pojo.WxAdminInfoDo;
+import com.cxg.weChat.crm.pojo.WxPlanPhotoDo;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -25,4 +26,10 @@ public interface PlanActivityMapper {
     int countPlanPhotoData(Query query);
 
     List<String> getDetailIdList(String detailId);
+
+    List<WxPlanPhotoDo> getProPhotoDataList(Query query);
+
+    int countProPhotoData(Query query);
+
+    List<WxPlanPhotoDo> getPlanPhotoList(Query query);
 }

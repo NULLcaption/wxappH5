@@ -6,6 +6,8 @@ import com.cxg.weChat.crm.pojo.UserInfoDo;
 import com.cxg.weChat.crm.pojo.WxAdminInfoDo;
 import com.cxg.weChat.crm.pojo.WxUserInfoDo;
 import com.cxg.weChat.crm.service.UserInfoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,7 @@ import java.util.List;
 @Transactional
 @Service
 public class UserInfoServiceImpl implements UserInfoService {
-
+    private final Logger logger = LoggerFactory.getLogger(UserInfoServiceImpl.class);
     @Autowired
     UserInfoMapper userInfoMapper;
 
@@ -102,7 +104,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public String findUserInfoStatus(WxUserInfoDo wxUserInfoDo) {
+    public WxUserInfoDo findUserInfoStatus(WxUserInfoDo wxUserInfoDo) {
         try {
             return userInfoMapper.findUserInfoStatus(wxUserInfoDo);
         } catch (Exception e) {
@@ -121,4 +123,26 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         return 0;
     }
+
+    @Override
+    public int updateUserInfoStatus1(WxUserInfoDo wxUserInfoDo) {
+        try {
+            userInfoMapper.updateUserInfoStatus1(wxUserInfoDo);
+            return 1;
+        } catch (Exception e) {
+            logger.debug(""+e);
+        }
+        return 0;
+    }
+
+    @Override
+    public String findUserInfoStatus1(WxUserInfoDo wxUserInfoDo) {
+        try {
+            return userInfoMapper.findUserInfoStatus1(wxUserInfoDo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

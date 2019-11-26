@@ -7,9 +7,10 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * @author: omybug
- * @date: 2019/1/15 17:36
- */
+ * @Description Jedis配置
+ * @Author xg.chen
+ * @Date 12:24 2019/11/25
+**/
 @Component
 public class JedisConfig {
 

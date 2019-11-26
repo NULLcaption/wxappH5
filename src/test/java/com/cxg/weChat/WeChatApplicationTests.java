@@ -11,6 +11,7 @@ public class WeChatApplicationTests {
 
 	@Test
 	public void contextLoads() {
+
 	}
 
 }

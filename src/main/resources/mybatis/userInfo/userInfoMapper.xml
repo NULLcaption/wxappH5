@@ -42,9 +42,9 @@
 
 	<insert id="creatWxUserInfo" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
 		INSERT INTO market.market_wx_user_info
-			(ID,OPEN_ID,NICK_NAME,AVATAR_URL,ACTIVITY_ID,STATUS)
+			(ID,OPEN_ID,NICK_NAME,AVATAR_URL,ACTIVITY_ID,STATUS,IS_TRANSMIT)
 		VALUES
-			(MARKET.MARKET_SEQ_WX_USER_INFO.nextval,#{openId},#{nickName},#{avatarUrl},#{activityId},#{status})
+			(MARKET.MARKET_SEQ_WX_USER_INFO.nextval,#{openId},#{nickName},#{avatarUrl},#{activityId},#{status},#{isTransmit})
 	</insert>
 
 	<select id="getPlanActivityList" parameterType="java.lang.String"
@@ -79,6 +79,10 @@
                  when 'N' then '未领取'
                  when 'Y' then '已领取'
   		        		 end status,
+  		       case (t.is_transmit)
+                 when 'N' then '未转发'
+                 when 'Y' then '已转发'
+  		        		 end isTransmit,
 			   t.avatar_url avatarUrl,
 			   t.nick_name nickName
 		  from market.market_wx_user_info t
@@ -87,16 +91,31 @@
 	</select>
 
 	<select id="findUserInfoStatus" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
-			resultType="java.lang.String">
-		select t.status
+			resultType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
+		select t.is_transmit isTransmit,t.status
 		  from market.market_wx_user_info t
 		  left join market.market_tb_plan_activity p on p.id = t.activity_id
 		 where t.open_id = #{openId} and t.activity_id = #{activityId}
 	</select>
 
+	<select id="findUserInfoStatus1" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
+			resultType="java.lang.String">
+		select t.status
+		from market.market_wx_user_info t
+		left join market.market_tb_plan_activity p on p.id = t.activity_id
+		where t.open_id = #{openId} and t.activity_id = #{activityId}
+	</select>
+
+
 	<update id="updateUserInfoStatus" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
 		update market.market_wx_user_info t
 		set t.status='Y'
+		where t.open_id=#{openId} and t.activity_id=#{activityId}
+	</update>
+
+	<update id="updateUserInfoStatus1" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
+		update market.market_wx_user_info t
+		set t.status='Y',t.is_transmit='Y'
 		where t.open_id=#{openId} and t.activity_id=#{activityId}
 	</update>
 </mapper>

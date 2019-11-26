@@ -3,6 +3,7 @@ package com.cxg.weChat.crm.service;
 import com.cxg.weChat.core.utils.Query;
 import com.cxg.weChat.crm.pojo.PlanActivityDo;
 import com.cxg.weChat.crm.pojo.WxAdminInfoDo;
+import com.cxg.weChat.crm.pojo.WxPlanPhotoDo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,4 +27,10 @@ public interface PlanActivitySrevice {
     int countPlanPhotoData(Query query);
 
     List<String> getDetailIdList(String detailId);
+
+    List<WxPlanPhotoDo> getProPhotoDataList(Query query);
+
+    int countProPhotoData(Query query);
+
+    List<WxPlanPhotoDo> getPlanPhotoList(Query query);
 }

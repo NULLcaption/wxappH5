@@ -3,19 +3,20 @@ package com.cxg.weChat.crm.pojo;
 import java.io.Serializable;
 
 /**
-* @Description:    活动执行人实体来
-* @Author:         Cheney Master
-* @CreateDate:     2018/11/8 14:43
-* @Version:        1.0
-*/
-public class WxAdminInfoDo implements Serializable{
-    private String id;
+ * @Description 微信推广管理员长传的图片
+ * @Author xg.chen
+ * @Date 14:20 2018/12/4
+**/
+
+public class WxPlanPhotoDo implements Serializable {
+
     private String openId;
+    private String activityId;
+    private String photoUrl;
+    private String creartDate;
+    private String id;
     private String nickName;
     private String avatarUrl;
-    private String signAddress;
-    private String signDate;
-    private String activityId;
     private String planId;
     private String userId;
     private String orgId;
@@ -24,13 +25,56 @@ public class WxAdminInfoDo implements Serializable{
     private String planTitle;
     private String planAddress;
     private String planStates;
+    private String userRole;
+    private String loginId;
+    private String userName;
 
-    public String getActivityId() {
-        return activityId;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setActivityId(String activityId) {
-        this.activityId = activityId;
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getLoginId() {
+        return loginId;
+    }
+
+    public void setLoginId(String loginId) {
+        this.loginId = loginId;
+    }
+
+    public String getUserRole() {
+        return userRole;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public String getPlanId() {
@@ -97,12 +141,12 @@ public class WxAdminInfoDo implements Serializable{
         this.planStates = planStates;
     }
 
-    public String getId() {
-        return id;
+    public String getCreartDate() {
+        return creartDate;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setCreartDate(String creartDate) {
+        this.creartDate = creartDate;
     }
 
     public String getOpenId() {
@@ -113,47 +157,29 @@ public class WxAdminInfoDo implements Serializable{
         this.openId = openId;
     }
 
-    public String getNickName() {
-        return nickName;
+    public String getActivityId() {
+        return activityId;
     }
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
+    public void setActivityId(String activityId) {
+        this.activityId = activityId;
     }
 
-    public String getAvatarUrl() {
-        return avatarUrl;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public String getSignAddress() {
-        return signAddress;
-    }
-
-    public void setSignAddress(String signAddress) {
-        this.signAddress = signAddress;
-    }
-
-    public String getSignDate() {
-        return signDate;
-    }
-
-    public void setSignDate(String signDate) {
-        this.signDate = signDate;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
     @Override
     public String toString() {
-        return "WxAdminInfoDo{" +
-                "id='" + id + '\'' +
-                ", openId='" + openId + '\'' +
-                ", nickName='" + nickName + '\'' +
-                ", avatarUrl='" + avatarUrl + '\'' +
-                ", signAddress='" + signAddress + '\'' +
-                ", signDate='" + signDate + '\'' +
+        return "WxPlanPhotoDo{" +
+                "openId='" + openId + '\'' +
+                ", activityId='" + activityId + '\'' +
+                ", photoUrl='" + photoUrl + '\'' +
+                ", creartDate='" + creartDate + '\'' +
                 '}';
     }
 }

@@ -33,7 +33,11 @@ public interface UserInfoService {
 
     List<WxUserInfoDo> getUserInfoByPlanId(String planId);
 
-    String findUserInfoStatus(WxUserInfoDo wxUserInfoDo);
+    WxUserInfoDo findUserInfoStatus(WxUserInfoDo wxUserInfoDo);
 
     int updateUserInfoStatus(WxUserInfoDo wxUserInfoDo);
+
+    int updateUserInfoStatus1(WxUserInfoDo wxUserInfoDo);
+
+    String findUserInfoStatus1(WxUserInfoDo wxUserInfoDo);
 }

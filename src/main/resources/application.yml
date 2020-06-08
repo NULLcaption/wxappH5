@@ -32,15 +32,9 @@ spring:
 #   oracle正式机连接方式
     type: com.alibaba.druid.pool.DruidDataSource
     driverClassName: oracle.jdbc.OracleDriver
-    url: jdbc:oracle:thin:exp/exp123@10.100.0.10:1530:expora
-    username: exp
-    password: exp123
-#       oracle测试机连接方式
-#    type: com.alibaba.druid.pool.DruidDataSource
-#    driverClassName: oracle.jdbc.OracleDriver
-#    url: jdbc:oracle:thin:osap/osap@10.0.5.16:1521:expdbtest
-#    username: osap
-#    password: osap
+    url: jdbc:oracle:thin:xxx/xxx@0.0.0.0:1512:test
+    username: 
+    password: 
 #   druid连接池配置
     initialSize: 1
     minIdle: 3
@@ -82,10 +76,10 @@ spring:
 #微信配置文件
 wechat:
     open:
-      componentAppId : "wx1c9a9ae4ce02880c"
-      componentSecret : "738fd034cd976bbf0a5bf05abaed961f"
-      componentToken : "ASADLJK45BFF43FDGD7897DFDGD"
-      componentAesKey : "ZKmhANpXAWNYrhLiXPpZoAmokloweUEeERleEBcfxPe"
+      componentAppId : ""
+      componentSecret : ""
+      componentToken : ""
+      componentAesKey : ""
 mybatis:
   configuration:
     map-underscore-to-camel-case: true

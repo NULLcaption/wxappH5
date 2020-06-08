@@ -33,7 +33,7 @@ public interface UserInfoMapper {
 
     List<WxUserInfoDo> getUserInfoByPlanId(String planId);
 
-    WxUserInfoDo findUserInfoStatus(WxUserInfoDo wxUserInfoDo);
+    List<WxUserInfoDo> findUserInfoStatus(WxUserInfoDo wxUserInfoDo);
 
     void updateUserInfoStatus(WxUserInfoDo wxUserInfoDo);
 

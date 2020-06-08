@@ -7,8 +7,12 @@ logging:
     root: info
     com.cxg.weChat: debug
 bootdo:
-  uploadPath: D:/var/uploaded_files/
-  imagePath: file:///D:/var/uploaded_files/production/
+  #  正式机路径
+  uploadPath: /var/uploaded_files/
+  imagePath: file:///var/uploaded_files/plan/
+  #  测试机路径
+#  uploadPath: D:/var/uploaded_files/
+#  imagePath: file:///D:/var/uploaded_files/plan/
 spring:
   thymeleaf:
     mode: LEGACYHTML5

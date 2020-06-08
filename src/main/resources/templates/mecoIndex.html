@@ -2,70 +2,50 @@
 <html lang="zh_CN" xmlns:th="http://www.thymeleaf.org">
 <head lang="en">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>呼朋唤友喝Meco 组队开黑真朋友</title>
+    <title>新品测试推广</title>
+    <script>
+        function onBridgeReady() {
+            WeixinJSBridge.call('hideOptionMenu');
+        }
+        if (typeof WeixinJSBridge == "undefined") {
+            if (document.addEventListener) {
+                document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+            } else if (document.attachEvent) {
+                document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+                document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+            }
+
+        } else {
+            onBridgeReady();
+        }
+    </script>
 </head>
 <head th:include="include :: header"></head>
-<script type="text/javascript">
-    document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
-        WeixinJSBridge.call('showOptionMenu');
-    });
-</script>
 <body class="gray-bg">
 <div class="wrapper wrapper-content ">
-    <div class="row">
-        <div class="col-sm-12" style="min-height: 0px">
+    <div class="row" style="margin-right: -10px;margin-left: -10px;">
+        <div class="col-sm-12" style="padding-right:0px; padding-left: 0px">
             <div class="ibox-content">
-                <input id="id" name="id" type="hidden" th:value="${planActivityDo.id}">
-                <input id="planId" name="planId" type="hidden" th:value="${planActivityDo.planId}">
-                <input id="openId" name="openId" type="hidden" th:value="${planActivityDo.openId}">
+                <input id="openId" name="openId" type="hidden" >
                 <div>
-                    <div class="col-sm-12">
-                        <p><img class="img-responsive center-block" src="http://exp.zjxpp.com:8186/upload_file/plan/mecoIndex.png" /></p>
+                    <div class="col-sm-12" style="padding-right: 0px; padding-left: 0px">
+                        <p><img class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/89387902482279866302.png" /></p>
                     </div>
                 </div>
-                <div class="container-fluid">
-                    <div class="row-fluid">
-                        <div class="span12">
-                            <blockquote style="margin: 0 0 0">
-                                <p style="color: #e28b41">
-                                    <span>呼朋唤友喝Meco 组队开黑真朋友</span>
-                                </p>
-                            </blockquote>
-                        </div>
-                    </div>
+                <div class="col-sm-12" style="padding-right: 0px; padding-left: 0px">
+                    <p>
+                        <img onclick="save(1)" class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/48157599500639307705.png" />
+                    </p>
                 </div>
-                <div class="panel panel-default" style="margin-bottom: 0;padding-left: 15px;panel-heading:#FFFFFF !important; border-color: #FFFFFF;">
-                    <div class="panel-body">
-                        <span>Meco蜜谷•果汁茶携手无限王者团的小哥哥们，今日给你们送福利啦！</span>
-                    </div>
-                    <div class="panel-body">
-                        <span>Meco果汁茶，真茶真果汁，好喝到不行。</span>
-                    </div>
-                    <div class="panel-body">
-                        <span>如果你是茶控？如果你是果汁控？</span>
-                    </div>
-                    <div class="panel-body">
-                        <span>那么Meco 蜜谷果汁茶，纯正果汁+现萃茶底，给你献上真材实料。</span>
-                    </div>
-                    <div class="panel-body">
-                        <span>果真好喝~</span>
-                    </div>
-                    <div class="panel-body">
-                        <span>对！对！对！Meco蜜谷•果汁茶无限王者团限定款，还可以扫码赢王者皮肤呢~</span>
-                    </div>
-                    <div class="panel-body">
-                        <span>PS：在杯身提示在“揭开”处，揭开后，微信扫描背后二维码，进入后台小程序可与男神互动，赢王者荣耀英雄皮肤！</span>
-                    </div>
+                <div class="col-sm-12" style="padding-right: 0px; padding-left: 0px">
+                    <p><img class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/49479300980582814448.png" /></p>
                 </div>
-                <div class="text-center" style="color: #fe2439">
-                    <p style="margin: 0 0 0;">注意:转发后，请到现场管理员处确认领取！</p>
+                <div class="col-sm-12" style="padding-right: 0px; padding-left: 0px">
+                    <p><img onclick="save(2)" class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/53412293885252100037.png" /></p>
                 </div>
-                <!--<div class="text-right form-group">-->
-                    <!--<button type="button"-->
-                            <!--class="btn btn-warning btn-lg btn-block"-->
-                            <!--style="color: #030303"-->
-                            <!--onclick="shareTimeline()">转发</button>-->
-                <!--</div>-->
+                <div class="col-sm-12" style="padding-right: 0px; padding-left: 0px">
+                    <p><img class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/70987011617988021649.png" /></p>
+                </div>
             </div>
         </div>
     </div>

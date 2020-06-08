@@ -104,7 +104,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public WxUserInfoDo findUserInfoStatus(WxUserInfoDo wxUserInfoDo) {
+    public List<WxUserInfoDo> findUserInfoStatus(WxUserInfoDo wxUserInfoDo) {
         try {
             return userInfoMapper.findUserInfoStatus(wxUserInfoDo);
         } catch (Exception e) {

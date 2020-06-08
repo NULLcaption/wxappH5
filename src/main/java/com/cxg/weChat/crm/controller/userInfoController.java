@@ -26,14 +26,18 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.websocket.server.PathParam;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * @Description: 后台基础类
+ * @Description: H5后台基础类
  * @Author: Cheney Master
  * @CreateDate: 2018/11/5 9:53
  * @Version: 1.0
@@ -57,132 +61,6 @@ public class userInfoController {
 
     @Autowired
     ValueOperations<String, Object> valueOperations;
-
-    /**jsapi_ticket*/
-    private static String jsapiTicket;
-    /**jsapi_ticket过期时间*/
-    private static long jsapiTicketExpires;
-
-    /**
-     * @Description 获取微信JS授权
-     * @Author xg.chen
-     * @Date 10:10 2019/8/29
-     **/
-    @PostMapping("/config")
-    @ResponseBody
-    public String configWxJs(@RequestParam("appId") String appId,@RequestParam("url") String url,HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        Map<String, Object> configValue = new HashMap<String, Object>();
-        /**设置jsapiTicket*/
-        int setTicketRes = setJsapiTicket(request,appId);
-        if( setTicketRes == 0 || jsapiTicket == null){
-            logger.debug("get jsapiTicket failed!");
-            return null;
-        }
-        String jsapi_ticket = jsapiTicket; //获取jsapi_ticket
-        long timestamp = System.currentTimeMillis() / 1000;
-        String nonceStr = RandomStr.createRandomString(16);
-        /**加密字符串*/
-        String str = "jsapi_ticket="+ jsapi_ticket +"&noncestr="+ nonceStr +"&timestamp="+ timestamp +"&url="+url;
-        String signature = Sha1.encode(str);
-        logger.debug("signature:" + signature);
-
-        configValue.put("signature", signature);
-        configValue.put("nonceStr", nonceStr);
-        configValue.put("timestamp", timestamp);
-
-        String config = JSON.toJSONString(configValue);
-        return config;
-    }
-
-    /**
-     * @Description 设置jsapiTicket
-     * @Author xg.chen
-     * @Date 13:32 2019/8/29
-     **/
-    private int setJsapiTicket(HttpServletRequest request,String appid){
-        long curTime = System.currentTimeMillis();
-        if(curTime < jsapiTicketExpires && jsapiTicket != null){
-            logger.debug("jsapiTicket not timeout,don't try again!");
-            return 1;
-        }
-        //获取access_token
-        Map<String, Object> accessTokenRes = getAccessToken();
-        if(accessTokenRes == null){
-            logger.debug("3 get accessToken failed!");
-            return 0;
-        }
-        String accessToken = (String) accessTokenRes.get("access_token");
-        try{
-            String res = HttpUtil.get("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + accessToken + "&type=jsapi");
-            JSONObject result = JSON.parseObject(res);
-            if(result.getString("errmsg").equals("ok")){
-                jsapiTicket = result.getString("ticket");
-                jsapiTicketExpires = curTime + 7200*1000;
-            }
-        }catch (Exception e){
-            logger.debug("4 error on get JsapiTicket" + e);
-            return 0;
-        }
-        return 1;
-    }
-
-    /**
-     * @Description token就重新获取
-     * @Author xg.chen
-     * @Date 13:41 2019/8/29
-     **/
-    private Map<String, Object> getAccessToken () {
-        String url = Constant.GET_URL+"&appid="+Constant.M_APP_ID+"&secret="+Constant.M_APP_SERCET;
-        //http发送请求
-        String data = HttpUtil.get(url);
-        ObjectMapper mapper = new ObjectMapper();
-        Map<String, Object> json = null;
-        try{
-            json = mapper.readValue(data, Map.class);
-            logger.debug("json{}：",json);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return json;
-    }
-
-
-    /**
-     * @Description 检查这个人是不是领取过了
-     * @Author xg.chen
-     * @Date 14:04 2019/3/13
-     */
-    @GetMapping("/userInfo")
-    @ResponseBody
-    public String creatWxUserInfo(String openId, String avatarUrl, String nickName, String id) {
-        //保存至数据数据中
-        WxUserInfoDo wxUserInfoDo = new WxUserInfoDo();
-        wxUserInfoDo.setOpenId(openId);
-        wxUserInfoDo.setAvatarUrl(avatarUrl);
-        wxUserInfoDo.setNickName(nickName);
-        wxUserInfoDo.setActivityId(id);
-        wxUserInfoDo.setStatus("N");
-        //先根据id和openId检查是否存在该用户
-        int num = userInfoService.getWxUserInfoById(wxUserInfoDo);
-        if (num == 0) {//没有的话就插入
-            userInfoService.creatWxUserInfo(wxUserInfoDo);
-        }
-        return "success";
-    }
-
-    /**
-     * @Description 获取已经参加测活动的人员的明细
-     * @Author xg.chen
-     * @Date 14:04 2019/3/13
-     */
-    @GetMapping("/plans")
-    @ResponseBody
-    public String getPlanActivityList(String openId) {
-        List<PlanActivityDo> planActivityDoList = userInfoService.getPlanActivityList(openId);
-        String json = JSONUtils.beanToJson(planActivityDoList);
-        return json;
-    }
 
     /**
      * @Description H5推广小程序页面
@@ -223,10 +101,11 @@ public class userInfoController {
         WxUserInfoDo wxUserInfoDo = new WxUserInfoDo();
         wxUserInfoDo.setOpenId(openId);
         wxUserInfoDo.setActivityId(id);
-        WxUserInfoDo wxUserInfo = userInfoService.findUserInfoStatus(wxUserInfoDo);
-        if (null != wxUserInfo) {
+        //这里的是问题是会有重复的微信用户
+        List<WxUserInfoDo> wxUserInfo = userInfoService.findUserInfoStatus(wxUserInfoDo);
+        if (wxUserInfo!=null && !wxUserInfo.isEmpty()) {
             //是否参加
-            if (wxUserInfo.getStatus().equals("N")) {
+            if (wxUserInfo.get(0).getStatus().equals("N")) {
                 if (planActivityDo != null) {
                     String[] string = planActivityDo.getPlanPhotoUrl().split(",");
                     planActivityDo.setPlanPhotoUrl(string[0]);
@@ -235,6 +114,8 @@ public class userInfoController {
                 model.addAttribute("planActivityDo", planActivityDo);
                 return "webappIndex";
             }
+        } else {
+            return "webappError/error_1";
         }
         return "webappError/error";
     }

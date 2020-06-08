@@ -131,21 +131,21 @@
         p.plan_address planAddress,
         p.plan_start_date planStartDate,
         p.plan_end_date planEndDate,
-        tt.open_id openId,
-        tt.nick_name nickName,
-        tt.avatar_url avatarUrl,
+        pp.openid openId,
+        a.nick_name nickName,
+        a.avatar_url avatarUrl,
         pp.photo_url photoUrl,
         pp.creart_date creartDate
         from market.markrt_wx_plan_photo pp
+        left join market.market_tb_plan_activity p on p.id = pp.ACTIVITY_ID
         left join (select distinct (t.activity_id) activity_id,
-        t.open_id,
-        t.nick_name,
-        t.avatar_url
-        from market.market_wx_admin_info t) tt on tt.open_id =
-        pp.openid
-        and tt.activity_id =
-        pp.activity_id
-        left join market.market_tb_plan_activity p on tt.activity_id = p.id
+                    t.open_id,
+                    t.nick_name,
+                    t.avatar_url
+                  from market.market_wx_admin_info t) a on (a.open_id =
+                                                    pp.openid and
+                                                    a.activity_id =
+                                                    pp.ACTIVITY_ID)
         <where>
             <if test="planId != null and planId != ''">and p.plan_id = #{planId}</if>
             <if test="id != null and id != ''">and p.id = #{id}</if>
@@ -171,15 +171,15 @@
     <select id="countPlanPhotoData" resultType="java.lang.Integer">
         select COUNT (*)
         from market.markrt_wx_plan_photo pp
+        left join market.market_tb_plan_activity p on p.id = pp.ACTIVITY_ID
         left join (select distinct (t.activity_id) activity_id,
         t.open_id,
         t.nick_name,
         t.avatar_url
-        from market.market_wx_admin_info t) tt on tt.open_id =
-        pp.openid
-        and tt.activity_id =
-        pp.activity_id
-        left join market.market_tb_plan_activity p on tt.activity_id = p.id
+        from market.market_wx_admin_info t) a on (a.open_id =
+        pp.openid and
+        a.activity_id =
+        pp.ACTIVITY_ID)
         <where>
             <if test="planId != null and planId != ''">and p.plan_id = #{planId}</if>
             <if test="id != null and id != ''">and p.id = #{id}</if>

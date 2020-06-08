@@ -1,0 +1,28 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="utf-8">
+    <title>大转盘抽奖</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css" th:href="@{/css/style.css}">
+    <script type="text/javascript" src="/js/jquery.min.js" th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" src="/js/awardRotate.js" th:src="@{/js/appjs/awardRotate.js}"></script>
+    <!--引入微信js文件-->
+    <script type="text/javascript" src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+    <script type="text/javascript" src="/js/appjs/data/award.js" th:src="@{/js/appjs/data/award.js}"></script>
+    <script src="/js/plugins/layer/layer.min.js" th:src="@{/js/plugins/layer/layer.min.js}"></script>
+</head>
+<body style="background:#e62d2d;overflow-x:hidden;">
+<br>
+<!-- 代码 开始 -->
+<img src="/img/1.png" th:src="@{/img/1.png}" id="shan-img" style="display:none;"/>
+<img src="/img/2.png" th:src="@{/img/2.png}" id="sorry-img" style="display:none;"/>
+
+<div class="banner">
+    <div class="turnplate" style="background-image:url(/img/turnplate-bg.png);background-size:100% 100%;">
+        <canvas class="item" id="wheelcanvas" width="422px" height="422px"></canvas>
+        <img class="pointer" src="/img/turnplate-pointer.png" th:src="@{/img/turnplate-pointer.png}"/>
+    </div>
+</div>
+<!-- 代码 结束 -->
+</body>
+</html>

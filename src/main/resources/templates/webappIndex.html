@@ -3,6 +3,22 @@
 <head lang="en">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title th:text="${planActivityDo.planTitle}"></title>
+    <style>
+        .fileinput-button {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+        }
+
+        .fileinput-button input{
+            position:absolute;
+            right: 0px;
+            top: 0px;
+            opacity: 0;
+            -ms-filter: 'alpha(opacity=0)';
+            font-size: 200px;
+        }
+    </style>
 </head>
 <head th:include="include :: header"></head>
 <script type="text/javascript">
@@ -62,6 +78,12 @@
                 <div class="text-center" style="color: #fe2439">
                     <p style="margin: 0 0 0;">请到现场管理员处确认领取</p>
                 </div>
+                <!--<div class="caption" style="padding-left: 10%">-->
+                    <!--<span class="btn btn-warning fileinput-button" style="width: 250px">-->
+                        <!--<span>上传点赞图片并领取</span>-->
+                        <!--<input accept="image/*"  type="file" id="uploadIMG"  onchange="btnUploadFile(event)"/>-->
+                    <!--</span>-->
+                <!--</div>-->
                 <div class="text-right form-group">
                     <button type="button"
                             class="btn btn-warning btn-lg btn-block"

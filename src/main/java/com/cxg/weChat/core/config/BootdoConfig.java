@@ -1,5 +1,6 @@
 package com.cxg.weChat.core.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -11,11 +12,12 @@ import org.springframework.stereotype.Component;
 */
 
 @Component
-@ConfigurationProperties(prefix="bootdo")
 public class BootdoConfig {
 	//上传路径
+	@Value("${bootdo.uploadPath}")
 	private String uploadPath;
 	//图片路径
+	@Value("${bootdo.imagePath}")
 	private String imagePath;
 
 	public String getUploadPath() {

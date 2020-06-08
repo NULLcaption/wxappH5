@@ -4,13 +4,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 
-/**
-* @Description:    用实体类
-* @Author:         Cheney Master
-* @CreateDate:     2018/11/13 15:45
-* @Version:        1.0
-*/
-
 public class AllUsersDo implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -19,63 +12,30 @@ public class AllUsersDo implements Serializable {
 
 	private String passWd;
 
-	/**
-	 * emp_name
-	 */
 	private String userName;
 
-	/**
-	 * emp_showname 显示名
-	 */
 	private String userShowName;
 
-	/**
-	 * EMP_STATE 人员状态
-	 */
 	private String userState;
 
 	private String custType;
 
-	/**
-	 * emp_code 人员在OA上的ID
-	 */
 	private String loginId;
-	/**
-	 * rtx_code 人员在rtx的id
-	 */
+
 	private String rtx_LoginId;
 
-	/**
-	 * emp_mobile_phone 人员手机号码 / 因原通讯录中使用bus_mobilephone作为手机号码 此共用一个字段
-	 */
 	private String mobile;
-	
-	/**
-	 * st_mobile 人员手机短号
-	 */
+
 	private String mobileSimple;
 
-	/**
-	 * emp_shortmsgbook 手机短信订阅
-	 */
 	private String empShortmsgbook;
 
 	private String smsUserTypeId;
 
 	private Long chargeId;
 
-	/**
-	 * emp_phone 人员电话号码
-	 */
 	private String phone;
-	/**
-	 * bus_mobilephone 短信手机号码
-	 */
 	private String busMobilephone;
-
-	/**
-	 * 是否总部人员 0:否;1:是
-	 */
 	private String hqSign;
 
 	private String kunnrSign;
@@ -87,64 +47,33 @@ public class AllUsersDo implements Serializable {
 	private String orgId;
 
 	private String orgName;
-
-	/**
-	 * emp_id_card 销售人员身份证号码
-	 */
 	private String idCard;
-
-	/**
-	 * emp_workfax 传真
-	 */
 	private String workFax;
-
-	/**
-	 * emp_homephone
-	 */
 	private String homePhone;
 
-	/**
-	 * emp_start_date 开始时间
-	 */
+
 	private String startDate;
 
-	/**
-	 * emp_address 地址
-	 */
+
 	private String address;
 
-	/**
-	 * emp_email 电子邮件
-	 */
+
 	private String email;
 
-	/**
-	 * emp_sex 人员性别
-	 */
+
 	private String sex;
 
-	/**
-	 * pos_name
-	 */
+
 	private String posName;
-	/**
-	 * 职位ID
-	 */
+
 	private String posId;
 
-	/**
-	 * havemail 是否开通邮箱（0否1是）
-	 */
+
 	private String haveMail;
 
-	/**
-	 * emp_remark 备注
-	 */
 	private String remark;
 
-	/**
-	 * position_type_name
-	 */
+
 	private String positionTypeName;
 
 	private String[] orgIds;
@@ -155,44 +84,41 @@ public class AllUsersDo implements Serializable {
 	
 	private String orgCodes;
 
-	/**
-	 * 內部内部供应商编号
-	 */
+
 	private String supplierNumber;
 
 	private String questionLinkId;
 
 	private String reason;
 
-	private String roleIds;// 岗位ID
+	private String roleIds;
 
-	private String stationState;// 岗位状态
+	private String stationState;
 
-	private String ids;// station_user表的ID 主键
+	private String ids;
 
 	private String[] userIds;
 
-	private String empPostId;// 职务ID
+	private String empPostId;
 
-	private String empPostName;// 职务ID
+	private String empPostName;
 
-	private String expressly;// 明文密码
+	private String expressly;
 
-	private String stationNames;// 职位名称 多个
+	private String stationNames;
 
-	private String ip;// 登录人IP
+	private String ip;
 
-	private String[] allOrg;// 登录人所有组织
-	private String expiredpsw;// 判断登录是否过期
-	private Long staffNubmer;// 用户编制数
+	private String[] allOrg;
+	private String expiredpsw;
+	private Long staffNubmer;
 	
-	private String empUserId; //人员编号
-	
-	//我司人员，用于经销商雇员管理中设置我司人员
+	private String empUserId;
+
 	private String xppEmpId;
 	private String xppEmpName;
 	
-	private Long emailOrgId;//邮箱组织id  腾讯要求数字格式
+	private Long emailOrgId;
 	
 	public Long getStaffNubmer() {
 		return staffNubmer;

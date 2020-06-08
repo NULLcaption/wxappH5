@@ -137,13 +137,23 @@ public class LoginController extends BaseController {
             wxMpUser = wxMpService.getUserService().userInfo(wxMpUser.getOpenId());
             String parm = id + "," + planId;
             if (wxMpUser.getSubscribe()) {//用户已关注
-                //将openId放在session中
-                session.setAttribute("openId", wxMpUser.getOpenId());
-                //将微信用户保存至数据库
-                createWxuserInfo(wxMpUser,id);
-                logger.error(Constant.URL + "/api/userInfo/admin/webappIndex/" + parm);
-                // 跳转到活动页面
-                response.sendRedirect(Constant.URL + "/api/userInfo/admin/webappIndex/" + parm);
+                if ("1".equals(id)) {
+                    //将openId放在session中
+                    session.setAttribute("openId", wxMpUser.getOpenId());
+                    //将微信用户保存至数据库
+                    createWxuserInfo(wxMpUser, id);
+                    logger.error(Constant.URL + "/api/userInfo/wx/xppTest");
+                    // 跳转到活动页面
+                    response.sendRedirect(Constant.URL + "/api/userInfo/wx/xppTest");
+                } else {
+                    //将openId放在session中
+                    session.setAttribute("openId", wxMpUser.getOpenId());
+                    //将微信用户保存至数据库
+                    createWxuserInfo(wxMpUser, id);
+                    logger.error(Constant.URL + "/api/userInfo/admin/webappIndex/" + parm);
+                    // 跳转到活动页面
+                    response.sendRedirect(Constant.URL + "/api/userInfo/admin/webappIndex/" + parm);
+                }
             } else {//用户未关注
                 logger.debug("------------>用户未关注");
                 response.sendRedirect(Constant.URL + "/api/userInfo/admin/notConcern/" + parm);
@@ -177,11 +187,15 @@ public class LoginController extends BaseController {
         wxUserInfoDo.setActivityId(id);
         wxUserInfoDo.setStatus("N");
         wxUserInfoDo.setIsTransmit("N");
-        //先根据id和openId检查是否存在该用户
+        //先根据openId检查是否存在该用户
+        //问题：插入的数据会重复
         int num = userInfoService.getWxUserInfoById(wxUserInfoDo);
         //没有的话就插入
         if (num == 0) {
-            userInfoService.creatWxUserInfo(wxUserInfoDo);
+            PoolSend poolSend = new PoolSend();
+            poolSend.send(() -> userInfoService.creatWxUserInfo(wxUserInfoDo));
+            poolSend.close();
+//            userInfoService.creatWxUserInfo(wxUserInfoDo);
         }
     }
 

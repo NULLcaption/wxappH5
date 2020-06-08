@@ -1,8 +1,6 @@
 package com.cxg.weChat.core.utils;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
+import java.io.*;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +14,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+
+import javax.net.ssl.HttpsURLConnection;
+
+
 /**
 * @Description:    封装http请求
 * @Author:         Cheney Master
@@ -166,4 +168,54 @@ public class HttpUtil {
         return null;
 
     }
+    /**
+     * @Description https request
+     * @Author xg.chen
+     * @Date 12:48 2020/3/30
+     **/
+    public static String httpsRequest(String requestUrl, String data) {
+        //请求方法
+        String requestMethod = "POST";
+        //输出字符串
+        StringBuffer buffer = new StringBuffer();
+        try {
+            //url请求连接
+            URL url = new URL(requestUrl);
+            HttpsURLConnection httpUrlConn = (HttpsURLConnection) url.openConnection();
+            httpUrlConn.setDoOutput(true);
+            httpUrlConn.setDoInput(true);
+            httpUrlConn.setUseCaches(false);
+            httpUrlConn.setRequestMethod(requestMethod);
+            //如果是get请求，则直接连接
+            if ("GET".equalsIgnoreCase(requestMethod))
+                httpUrlConn.connect();
+            //输入参数为不为空，则处理输参数
+            if (null != data) {
+                OutputStream outputStream = httpUrlConn.getOutputStream();
+                outputStream.write(data.getBytes("UTF-8"));
+                outputStream.close();
+            }
+            //连接成功以后输出参数
+            InputStream inputStream = httpUrlConn.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            String str;
+            while ((str = bufferedReader.readLine()) != null) {
+                buffer.append(str);
+            }
+            bufferedReader.close();
+            inputStreamReader.close();
+            inputStream.close();
+            httpUrlConn.disconnect();
+            return buffer.toString();
+        } catch (ConnectException ce) {
+            ce.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+
 }

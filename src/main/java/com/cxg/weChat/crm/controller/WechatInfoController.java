@@ -76,6 +76,7 @@ public class WechatInfoController {
         String signature = Sha1.encode(str);
         logger.debug("signature:" + signature);
 
+        configValue.put("appId",Constant.M_APP_ID);
         configValue.put("signature", signature);
         configValue.put("nonceStr", nonceStr);
         configValue.put("timestamp", timestamp);

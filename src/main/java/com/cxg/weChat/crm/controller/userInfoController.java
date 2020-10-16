@@ -77,10 +77,10 @@ public class userInfoController {
         String id = strs[0].toString().trim();
         String planId = strs[1].toString().trim();
         //获取缓存中的openId
-        session = request.getSession();
-        String openId = (String) session.getAttribute("openId");
+//        session = request.getSession();
+//        String openId = (String) session.getAttribute("openId");
 //        测试数据
-//        String openId = "oVgr8wUxM2JWhdcEIiNbBhY1ppEA";
+        String openId = "oVgr8wUxM2JWhdcEIiNbBhY1ppEA";
         //不是扫码进来的
         if(StringUtils.isEmpty(openId)) {
             return "webappError/error_1";
@@ -214,8 +214,25 @@ public class userInfoController {
      * @return
      */
     @GetMapping("/success")
-    public String successRed() {
-        return "webappError/success";
+    public String successRed(String id,String planId, String openId, Model model) {
+        //根据活动类型来处理不同的海报
+        //获取活动数据
+        PlanActivityDo planActivityDo = getPlanActivityData(id, planId);
+        if (planActivityDo != null) {
+            String[] string = planActivityDo.getPlanPhotoUrl().split(",");
+            planActivityDo.setPlanPhotoUrl(string[0]);
+        }
+        planActivityDo.setOpenId(openId.substring(8, 20));
+        model.addAttribute("planActivityDo", planActivityDo);
+        //校园活动
+        if ("1".equals(planActivityDo.getStatus())) {
+            return "webappError/success_1";
+        }
+        //快闪活动
+        if ("3".equals(planActivityDo.getStatus())) {
+            return "webappError/success_3";
+        }
+        return "webappError/success_1";
     }
 
 }

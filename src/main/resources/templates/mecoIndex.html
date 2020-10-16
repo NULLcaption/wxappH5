@@ -3,22 +3,6 @@
 <head lang="en">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>新品测试推广</title>
-    <script>
-        function onBridgeReady() {
-            WeixinJSBridge.call('hideOptionMenu');
-        }
-        if (typeof WeixinJSBridge == "undefined") {
-            if (document.addEventListener) {
-                document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
-            } else if (document.attachEvent) {
-                document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
-                document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
-            }
-
-        } else {
-            onBridgeReady();
-        }
-    </script>
 </head>
 <head th:include="include :: header"></head>
 <body class="gray-bg">
@@ -26,33 +10,19 @@
     <div class="row" style="margin-right: -10px;margin-left: -10px;">
         <div class="col-sm-12" style="padding-right:0px; padding-left: 0px">
             <div class="ibox-content">
-                <input id="openId" name="openId" type="hidden" >
                 <div>
                     <div class="col-sm-12" style="padding-right: 0px; padding-left: 0px">
-                        <p><img class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/89387902482279866302.png" /></p>
+                        <div id="wxOpenInAPP" class="wexin-launch-btn" v-show="isOK"></div>
                     </div>
                 </div>
-                <div class="col-sm-12" style="padding-right: 0px; padding-left: 0px">
-                    <p>
-                        <img onclick="save(1)" class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/48157599500639307705.png" />
-                    </p>
-                </div>
-                <div class="col-sm-12" style="padding-right: 0px; padding-left: 0px">
-                    <p><img class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/49479300980582814448.png" /></p>
-                </div>
-                <div class="col-sm-12" style="padding-right: 0px; padding-left: 0px">
-                    <p><img onclick="save(2)" class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/53412293885252100037.png" /></p>
-                </div>
-                <div class="col-sm-12" style="padding-right: 0px; padding-left: 0px">
-                    <p><img class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/70987011617988021649.png" /></p>
-                </div>
+
             </div>
         </div>
     </div>
 </div>
 <div th:include="include::footer"></div>
 <!--引入微信js文件-->
-<script type="text/javascript" src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+<script type="text/javascript" src="http://res2.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
 <!--首页展示js文件-->
 <script src="/js/appjs/webapp.js" th:src="@{/js/appjs/mecoIndex.js}"></script>
 </body>

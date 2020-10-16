@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8" http-equiv="Access-Control-Allow-Origin" content="yes">
+    <title></title>
+    <style>
+        body {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        .main{
+            height: 100%;
+            padding: 0 0 0;
+            box-sizing: border-box ;
+        }
+        .poster-container{
+            background: url("/static/img/bgm.png") no-repeat center;
+            background-size: 100% 100%;
+            padding-top: 100%;
+        }
+        .toimg{
+            position:fixed;
+            left:0px;
+            top: 0px;
+            width:100%;
+            height:100%;
+        }
+    </style>
+</head>
+<head th:include="include :: header"></head>
+<body>
+<div class="main" id="poster-container" >
+    <div class="poster-container ">
+        <div class="row">
+        <div class="col-sm-12" style="min-height: 0px">
+            <div class="ibox-content">
+                <div class="container-fluid">
+                    <div class="row-fluid">
+                        <div class="span12">
+                            <blockquote style="margin: 0 0 0">
+                                <p style="color: #e28b41">
+                                    <span th:text="${planActivityDo.planTitle}"></span>
+                                </p>
+                                <small style="color: #030303">
+                                    <span th:text="${planActivityDo.planAddress}"></span>
+                                </small>
+                            </blockquote>
+                        </div>
+                        <div class="span12">
+                            <address style="color: #8a1f11; margin: 0 0 0">
+                                <label class="col-sm-12 control-label">活动时间:</label>
+                                <span th:text="${planActivityDo.planStartDate}"></span>
+                                到
+                                <span th:text="${planActivityDo.planEndDate}"></span>
+                            </address>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center" style="color: #fe2439">
+                    <p style="margin: 0 0 0;">长按识别二维码获取更多内容</p>
+                </div>
+                <div class="container" style="padding-left: 40%">
+                    <div class="poster-qrcode"></div>
+                </div>
+                <div class="text-center" style="color: #fe2439">
+                    <label class="col-sm-12 control-label">抽奖码:</label>
+                    <p style="margin: 0 0 0;" th:text="${planActivityDo.openId}"></p>
+                </div>
+                <div class="text-center" style="color: #fe2439">
+                    <label class="col-sm-12 control-label"></label>
+                    <p style="margin: 0 0 0;"></p>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<!--生成图片后显示-->
+<div class="toimg">
+
+        <!--<div class="pull-right close-img" style="padding-right:20px;margin-bottom:20px;"><i class="glyphicon glyphicon-remove"></i></div>-->
+        <img id="posterImg" class="img-responsive" style="width:100%;height:100%;display:inline-block;" />
+
+</div>
+
+<script src="https://libs.baidu.com/jquery/1.7.0/jquery.min.js"></script>
+<script src="http://www.jq22.com/js/jquery.qrcode.min.js"></script>
+<script src="/static/js/html2canvas.min.js" th:src="@{/static/js/html2canvas.min.js}"></script>
+<script src="/js/plugins/layer/layer.min.js" th:src="@{/js/plugins/layer/layer.min.js}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        layer.msg("长按图片并保存");
+        //生成二维码
+        $('.poster-qrcode').qrcode({
+            mode: 4,
+            mSize: 20,
+            //label: '文字Logo',//使用文字logo必须去掉mode,mSize参数
+            image: $(".poster-qrcode-logo")[0],
+            text: window.location.href,
+            size: 1080 / 3,
+            render: 'canvas',
+            width: 80,
+            height: 80
+        });
+        createPoster();
+    });
+    // 生成海报
+    function createPoster() {
+        $(".article").hide();
+        $(".toimg").show();
+        $("#poster-container").show();
+
+        var dom = $('.poster-container');
+        var width = $('.main').width(); //获取dom 宽度
+        var height = $('.main').height(); //获取dom 高度
+        var canvas = document.createElement("canvas"); //创建一个canvas节点
+        var scale = 1; //定义任意放大倍数 支持小数
+        canvas.width = width * scale; //定义canvas 宽度 * 缩放
+        canvas.height = height * scale; //定义canvas高度 *缩放
+        //当前滚动条的位置
+        var scrollY = $(document).scrollTop();
+        var scrollX = $(document).scrollLeft();
+        var  el = document.querySelector(".poster-container");
+        html2canvas(document.getElementById("poster-container"),{
+            useCORS: true, //跨域
+            allowTaint: false,
+            canvas: canvas, //自定义 canvas
+            logging: false,
+            letterRendering: true,
+            taintTest: true, //在渲染前测试图片
+            dpi: window.devicePixelRatio, // window.devicePixelRatio是设备像素比
+            background: "#6E5B49",
+            width:width,
+            height:height,
+            scale:scale, // 添加的scale 参数
+            scrollY:-scrollY,
+            scrollX:-scrollX
+        }).then(function(canvas) {
+            var imgUrl = canvas.toDataURL('image/jpeg');
+            document.getElementById('posterImg').setAttribute('src', imgUrl);
+            $("#poster-container").hide();
+            $(".article").show();
+        });
+    }
+
+    $(".close-img").click(function () {
+        $(".toimg").hide();
+    })
+</script>
+</body>
+</html>

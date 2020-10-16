@@ -142,28 +142,28 @@ public class LoginController extends BaseController {
                     session.setAttribute("openId", wxMpUser.getOpenId());
                     //将微信用户保存至数据库
                     createWxuserInfo(wxMpUser, id);
-                    logger.error(Constant.URL + "/api/userInfo/wx/xppTest");
+                    logger.error(Constant.TEST_URL + "/api/userInfo/wx/xppTest");
                     // 跳转到活动页面
-                    response.sendRedirect(Constant.URL + "/api/userInfo/wx/xppTest");
+                    response.sendRedirect(Constant.TEST_URL + "/api/userInfo/wx/xppTest");
                 } else {
                     //将openId放在session中
                     session.setAttribute("openId", wxMpUser.getOpenId());
                     //将微信用户保存至数据库
                     createWxuserInfo(wxMpUser, id);
-                    logger.error(Constant.URL + "/api/userInfo/admin/webappIndex/" + parm);
+                    logger.error(Constant.TEST_URL + "/api/userInfo/admin/webappIndex/" + parm);
                     // 跳转到活动页面
-                    response.sendRedirect(Constant.URL + "/api/userInfo/admin/webappIndex/" + parm);
+                    response.sendRedirect(Constant.TEST_URL + "/api/userInfo/admin/webappIndex/" + parm);
                 }
             } else {//用户未关注
                 logger.debug("------------>用户未关注");
-                response.sendRedirect(Constant.URL + "/api/userInfo/admin/notConcern/" + parm);
+                response.sendRedirect(Constant.TEST_URL + "/api/userInfo/admin/notConcern/" + parm);
             }
             return null;
         } else {
             // 重新进行授权
             String scope = "snsapi_userinfo";
             String state = "";
-            String callbackUrl = Constant.URL + "/login/" + activityId;
+            String callbackUrl = Constant.TEST_URL + "/login/" + activityId;
             if (null != redirect) {
                 callbackUrl += "?redirect=" + redirect;
             }

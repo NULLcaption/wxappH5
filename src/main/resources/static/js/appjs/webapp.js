@@ -12,25 +12,30 @@ $.validator.setDefaults({
         save(1);
     }
 });
-//确认领取
+/**
+ * 确认领取
+ * @param status
+ */
 function save(status) {
-    $.ajax({
-        type : 'POST',
-        data : {
-            "id" : $("#id").val(),
-            "planId" : $("#planId").val(),
-            "openId" : $("#openId").val()
-        },
-        url : prefix + '/submit1',
-        success : function(r) {
-            if (r.code == 0) {
-                layer.msg("亲！您已领取成功！");
-                window.location.href = prefix+"/success";
-            } else {
-                layer.msg("亲！您已经领取了，不能重复领取了！");
-            }
-        }
-    });
+    window.location.href = prefix+"/success?id="+$("#id").val()+'&planId='+$("#planId").val()+'&openId='+$("#openId").val();
+    //$.ajax({
+    //    type : 'POST',
+    //    data : {
+    //        "id" : $("#id").val(),
+    //        "planId" : $("#planId").val(),
+    //        "openId" : $("#openId").val()
+    //    },
+    //    url : prefix + '/submit1',
+    //    success : function(r) {
+    //        if (r.code == 0) {
+    //            layer.msg("亲！您已领取成功！");
+    //            //分享海报
+    //            window.location.href = prefix+"/success?id="+$("#id").val()+'&planId='+$("#planId").val()+'&openId='+$("#openId").val();
+    //        } else {
+    //            layer.msg("亲！您已经领取了，不能重复领取了！");
+    //        }
+    //    }
+    //});
 }
 
 /**

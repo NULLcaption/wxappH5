@@ -3,9 +3,67 @@
  * Created by Administrator on 2019/3/13.
  */
 var prefix = "/api/userInfo/wx";
+//微信JS授权
 $().ready(function() {
-    //getWxConfig();
+    getWxConfig();
 });
+
+function getWxConfig() {
+    var url = location.href.split('#')[0];//当前的url
+    $.ajax({
+        type: "POST",
+        url: prefix + "/config",
+        dataType: 'json',
+        data : {
+            "appId" : "wxe9bec4afeb0d2985",
+            "url" : url
+        },
+        success: function (data) {
+            wxConfig(data);
+        },
+        error: function() {
+            alert("授权错误")
+        }
+    });
+}
+
+function wxConfig(_config) {
+    //获取微信的配置信息
+    wx.config({
+        debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+        appId: _config.appId, // 必填，公众号的唯一标识
+        timestamp: _config.timestamp, // 必填，生成签名的时间戳
+        nonceStr: _config.nonceStr, // 必填，生成签名的随机串
+        signature: _config.signature,// 必填，签名
+        jsApiList: [
+            'updateAppMessageShareData',//自定义“分享给朋友”及“分享到QQ”按钮的分享内容
+            'updateTimelineShareData', //自定义“分享到朋友圈”及“分享到QQ空间”按钮的分享内容
+            'onMenuShareTimeline',
+            'onMenuShareAppMessage'
+        ], // 必填，需要使用的JS接口列表
+        openTagList: ['wx-open-launch-app'] // 可选，需要使用的开放标签列表，例如['wx-open-launch-app']
+    });
+
+    wx.ready(function () {
+        alert('微信授权成功');
+        var dom = document.getElementById('wxOpenInAPP') //
+        dom.innerHTML = '<wx-open-launch-app style="width:100%; display:block;" id="launch-btn"     extinfo="" appid=""><template><style>  .wx-btn {   color: #666; width: 100%; height:100%; display: block; text-aligin:center; }</style><button class="wx-btn">我想接这单</button></template></wx-open-launch-app>'
+        var launchBtn = document.getElementById('launch-btn')
+        if (!launchBtn) {
+        }
+        launchBtn.setAttribute('appid','gh_583b84db012a')
+        launchBtn.setAttribute('extinfo', '{"url":"pages/redEnvelope/index"}')
+        launchBtn.addEventListener('launch', function (e) {
+            console.log('success')
+        })
+        launchBtn.addEventListener('error', function (e) {
+            console.log('fail', e.detail)
+        })
+    });
+}
+
+
+
 
 $.validator.setDefaults({
     submitHandler : function() {

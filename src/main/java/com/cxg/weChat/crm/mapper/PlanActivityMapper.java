@@ -32,4 +32,6 @@ public interface PlanActivityMapper {
     int countProPhotoData(Query query);
 
     List<WxPlanPhotoDo> getPlanPhotoList(Query query);
+
+    int getPlanListCount(PlanActivityDo planActivityDo);
 }

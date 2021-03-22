@@ -23,6 +23,7 @@ public class PlanActivitySreviceImpl implements PlanActivitySrevice {
 
     @Autowired
     PlanActivityMapper planActivityMapper;
+
     @Override
     public List<PlanActivityDo> getPlanList(Query query) {
         try {
@@ -81,6 +82,16 @@ public class PlanActivitySreviceImpl implements PlanActivitySrevice {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public int getPlanListCount(PlanActivityDo planActivityDo) {
+        try {
+            return planActivityMapper.getPlanListCount(planActivityDo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
 

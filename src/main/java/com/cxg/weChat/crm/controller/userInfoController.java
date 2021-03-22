@@ -34,7 +34,9 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description: H5后台基础类
@@ -77,33 +79,45 @@ public class userInfoController {
         String id = strs[0].toString().trim();
         String planId = strs[1].toString().trim();
         //获取缓存中的openId
-//        session = request.getSession();
-//        String openId = (String) session.getAttribute("openId");
+        session = request.getSession();
+        String openId = (String) session.getAttribute("openId");
 //        测试数据
-        String openId = "oVgr8wUxM2JWhdcEIiNbBhY1ppEA";
+//        String openId = "oVgr8wUxM2JWhdcEIiNbBhY1ppEA";
+//        String openId = "oFC_wwvzIsoo9iJxkFRUSK57g_Yg";
         //不是扫码进来的
         if(StringUtils.isEmpty(openId)) {
             return "webappError/error_1";
         }
         //获取活动数据
         PlanActivityDo planActivityDo = getPlanActivityData(id, planId);
-        //控制活动的时间
-        String plamDate = getPlanDate(planActivityDo);
-        if ("1".equals(plamDate)) {
-            //活动未开始
+        int count = userInfoService.getUserInfoCountByPlanId(id);
+        //控制活动派样数量
+        if (count == Integer.parseInt(planActivityDo.getPlanNum())) {
+            return "webappError/startedDone";
+        }
+        //控制活动扫码时间
+        boolean scanCodeTime = getPlanScanCodeTime(planActivityDo);
+        if (false == scanCodeTime) {
+            return "webappError/unstarttime";
+        }
+        //控制活动起止时间
+        String planDate = getPlanDate(planActivityDo);
+        if ("1".equals(planDate)) {
             return "webappError/unstart";
         }
-        if ("2".equals(plamDate)) {
-            //活动已结束
+        if ("2".equals(planDate)) {
             return "webappError/started";
         }
         //活动正常执行
         WxUserInfoDo wxUserInfoDo = new WxUserInfoDo();
         wxUserInfoDo.setOpenId(openId);
         wxUserInfoDo.setActivityId(id);
-        //这里的是问题是会有重复的微信用户
+        wxUserInfoDo.setPlanId(planId);
+        wxUserInfoDo.setCreateTime(String.valueOf(LocalDate.now().getYear()));
+        wxUserInfoDo.setBrand(planActivityDo.getBrand());
+        //查询用户是否参加过之前的活动
         List<WxUserInfoDo> wxUserInfo = userInfoService.findUserInfoStatus(wxUserInfoDo);
-        if (wxUserInfo!=null && !wxUserInfo.isEmpty()) {
+        if (wxUserInfo !=null && !wxUserInfo.isEmpty()) {
             //是否参加
             if (wxUserInfo.get(0).getStatus().equals("N")) {
                 if (planActivityDo != null) {
@@ -112,10 +126,18 @@ public class userInfoController {
                 }
                 planActivityDo.setOpenId(openId);
                 model.addAttribute("planActivityDo", planActivityDo);
-                return "webappIndex";
+                if ("G".equals(planActivityDo.getBrand())){
+                    return "webappIndex";
+                }
+                if ("L".equals(planActivityDo.getBrand())){
+                    return "webappIndex_l";
+                }
+                if ("X".equals(planActivityDo.getBrand())){
+                    return "webappIndex_x";
+                }
+            } else {
+                return "webappError/error";
             }
-        } else {
-            return "webappError/error_1";
         }
         return "webappError/error";
     }
@@ -136,14 +158,73 @@ public class userInfoController {
             planActivityDo.setId(id);
             planActivityDo.setPlanId(planId);
             planActivityDo = userInfoService.getPlanActivityById(planActivityDo);
-            valueOperations.set("planActivityDo_"+id, planActivityDo);
+            valueOperations.set("planActivityDo_"+id, planActivityDo, Constant.KEY_TIME, TimeUnit.SECONDS);
             return planActivityDo;
         }
         return redisDo;
     }
 
     /**
-     * @Description 活动时间控制
+     * 扫码活动时间控制
+     * @param planActivityDo
+     * @return
+     * @throws ParseException
+     */
+    public boolean getPlanScanCodeTime(PlanActivityDo planActivityDo) throws ParseException {
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+        Date nowTime = new SimpleDateFormat("HH:mm:ss").parse(df.format(new Date()));
+        if ("0".equals(planActivityDo.getPlanStates()) ||
+                "1".equals(planActivityDo.getPlanStates()) ||
+                "2".equals(planActivityDo.getPlanStates())) {
+            Date startTime = new SimpleDateFormat("HH:mm:ss").parse("09:00:00");
+            Date endTime = new SimpleDateFormat("HH:mm:ss").parse("20:00:00");
+            boolean isTime = isEffectiveDate(nowTime,startTime,endTime);
+            if (isTime == false){
+                return false;
+            }
+        }
+        if ("3".equals(planActivityDo.getPlanStates())) {
+            Date startTime = new SimpleDateFormat("HH:mm:ss").parse("09:00:00");
+            Date endTime = new SimpleDateFormat("HH:mm:ss").parse("23:00:00");
+            boolean isTime = isEffectiveDate(nowTime,startTime,endTime);
+            if (isTime == false){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 判断当前时间是否在[startTime, endTime]区间，注意时间格式要一致
+     *
+     * @param nowTime 当前时间
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return
+     */
+    public static boolean isEffectiveDate(Date nowTime, Date startTime, Date endTime) {
+        if (nowTime.getTime() == startTime.getTime()
+                || nowTime.getTime() == endTime.getTime()) {
+            return true;
+        }
+        Calendar date = Calendar.getInstance();
+        date.setTime(nowTime);
+
+        Calendar begin = Calendar.getInstance();
+        begin.setTime(startTime);
+
+        Calendar end = Calendar.getInstance();
+        end.setTime(endTime);
+
+        if (date.after(begin) && date.before(end)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @Description 活动起止时间控制
      * @Author xg.chen
      * @Date 14:11 2019/11/25
     **/
@@ -195,15 +276,17 @@ public class userInfoController {
     @PostMapping("/submit1")
     @ResponseBody
     public R Activities2Confirm1(@RequestParam("id") String id,
-                                 @RequestParam("planId") String planId,
-                                 @RequestParam("openId") String openId,
-                                 HttpServletRequest request) {
+                                 @RequestParam("openId") String openId) {
         WxUserInfoDo wxUserInfoDo = new WxUserInfoDo();
         wxUserInfoDo.setOpenId(openId);
         wxUserInfoDo.setActivityId(id);
-        int num = userInfoService.updateUserInfoStatus(wxUserInfoDo);
-        if (num > 0) {
-            return R.ok();
+        wxUserInfoDo.setCreateTime(String.valueOf(LocalDate.now().getYear()));
+        List<WxUserInfoDo> wxUserInfo = userInfoService.findUserInfoStatusByOpenId(wxUserInfoDo);
+        if (wxUserInfo != null) {
+            //用户已经领取
+            if ("Y".equals(wxUserInfo.get(0).getStatus())) {
+                return R.ok();
+            }
         }
         return R.error();
     }
@@ -218,21 +301,17 @@ public class userInfoController {
         //根据活动类型来处理不同的海报
         //获取活动数据
         PlanActivityDo planActivityDo = getPlanActivityData(id, planId);
-        if (planActivityDo != null) {
-            String[] string = planActivityDo.getPlanPhotoUrl().split(",");
-            planActivityDo.setPlanPhotoUrl(string[0]);
-        }
         planActivityDo.setOpenId(openId.substring(8, 20));
         model.addAttribute("planActivityDo", planActivityDo);
         //校园活动
-        if ("1".equals(planActivityDo.getStatus())) {
-            return "webappError/success_1";
+        if ("1".equals(planActivityDo.getPlanStates())) {
+            return "webappError/success_4";
         }
         //快闪活动
-        if ("3".equals(planActivityDo.getStatus())) {
-            return "webappError/success_3";
+        if ("3".equals(planActivityDo.getPlanStates())) {
+            return "webappError/success_4";
         }
-        return "webappError/success_1";
+        return "webappError/success";
     }
 
 }

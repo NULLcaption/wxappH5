@@ -32,6 +32,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.SimpleFormatter;
 
 
 /**
@@ -125,6 +128,7 @@ public class LoginController extends BaseController {
             //2.如果session中没有则用code获取access_token
             if (null == wxMpOAuth2AccessToken) {
                 // 获取用户信息
+                logger.debug("appid=======>>"+appid);
                 wxMpOAuth2AccessToken = wxOpenComponentService.oauth2getAccessToken(appid, code);
                 // 将获取到的access_token放在缓存里
                 session.setAttribute("access_token", wxMpOAuth2AccessToken.getAccessToken());
@@ -137,33 +141,23 @@ public class LoginController extends BaseController {
             wxMpUser = wxMpService.getUserService().userInfo(wxMpUser.getOpenId());
             String parm = id + "," + planId;
             if (wxMpUser.getSubscribe()) {//用户已关注
-                if ("1".equals(id)) {
-                    //将openId放在session中
-                    session.setAttribute("openId", wxMpUser.getOpenId());
-                    //将微信用户保存至数据库
-                    createWxuserInfo(wxMpUser, id);
-                    logger.error(Constant.TEST_URL + "/api/userInfo/wx/xppTest");
-                    // 跳转到活动页面
-                    response.sendRedirect(Constant.TEST_URL + "/api/userInfo/wx/xppTest");
-                } else {
-                    //将openId放在session中
-                    session.setAttribute("openId", wxMpUser.getOpenId());
-                    //将微信用户保存至数据库
-                    createWxuserInfo(wxMpUser, id);
-                    logger.error(Constant.TEST_URL + "/api/userInfo/admin/webappIndex/" + parm);
-                    // 跳转到活动页面
-                    response.sendRedirect(Constant.TEST_URL + "/api/userInfo/admin/webappIndex/" + parm);
-                }
-            } else {//用户未关注
+                //将openId放在session中
+                session.setAttribute("openId", wxMpUser.getOpenId());
+                //将微信用户保存至数据库
+                createWxuserInfo(wxMpUser, id);
+                logger.error(Constant.URL + "/api/userInfo/admin/webappIndex/" + parm);
+                // 跳转到活动页面
+                response.sendRedirect(Constant.URL + "/api/userInfo/admin/webappIndex/" + parm);
+        } else {//用户未关注
                 logger.debug("------------>用户未关注");
-                response.sendRedirect(Constant.TEST_URL + "/api/userInfo/admin/notConcern/" + parm);
+                response.sendRedirect(Constant.URL + "/api/userInfo/admin/notConcern/" + parm);
             }
             return null;
         } else {
             // 重新进行授权
             String scope = "snsapi_userinfo";
             String state = "";
-            String callbackUrl = Constant.TEST_URL + "/login/" + activityId;
+            String callbackUrl = Constant.URL + "/login/" + activityId;
             if (null != redirect) {
                 callbackUrl += "?redirect=" + redirect;
             }
@@ -187,15 +181,17 @@ public class LoginController extends BaseController {
         wxUserInfoDo.setActivityId(id);
         wxUserInfoDo.setStatus("N");
         wxUserInfoDo.setIsTransmit("N");
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        wxUserInfoDo.setCreateTime(formatter.format(date));
         //先根据openId检查是否存在该用户
-        //问题：插入的数据会重复
         int num = userInfoService.getWxUserInfoById(wxUserInfoDo);
+        logger.debug("openId检查是否存在该用户==>"+num);
         //没有的话就插入
         if (num == 0) {
             PoolSend poolSend = new PoolSend();
             poolSend.send(() -> userInfoService.creatWxUserInfo(wxUserInfoDo));
             poolSend.close();
-//            userInfoService.creatWxUserInfo(wxUserInfoDo);
         }
     }
 

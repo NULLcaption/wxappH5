@@ -40,4 +40,12 @@ public interface UserInfoService {
     int updateUserInfoStatus1(WxUserInfoDo wxUserInfoDo);
 
     String findUserInfoStatus1(WxUserInfoDo wxUserInfoDo);
+
+    List<WxUserInfoDo> getOpeIdAndactivityId();
+
+    List<WxUserInfoDo> getWxUserInfoList();
+
+    int getUserInfoCountByPlanId(String planId);
+
+    List<WxUserInfoDo> findUserInfoStatusByOpenId(WxUserInfoDo wxUserInfoDo);
 }

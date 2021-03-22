@@ -77,7 +77,7 @@
 //    /**
 //     * shiro过滤设置
 //     * 创建一些默认的过滤器对客户端请求进行过滤
-//     * @param securityManager
+////     * @param securityManager
 //     * @return
 //     */
 //	@Bean

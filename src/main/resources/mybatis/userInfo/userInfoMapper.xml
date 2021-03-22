@@ -29,9 +29,25 @@
 			   t.plan_photo_url planPhotoUrl,
 			   t.plan_explain planExplain,
 			   t.plan_get_explain planGetExplain,
-			   t.plan_qrcode_url planQrcodeUrl
-		 from market.market_tb_plan_activity t where t.id = #{id}
+			   t.plan_qrcode_url planQrcodeUrl,
+			   t.plan_num planNum,
+			   tt.brand brand,
+			   t.matnr02,
+			   t.matnr
+		 from market.market_tb_plan_activity t
+		 left join market.market_tb_terminal_total tt on tt.plan_id=t.plan_id
+		where t.id = #{id}
     </select>
+
+	<select id="getUserInfoCountByPlanId" parameterType="java.lang.String"
+			resultType="java.lang.Integer">
+		select count(distinct(t.open_id))
+		from market.market_wx_user_info t
+		left join market.market_tb_plan_activity p on p.id = t.activity_id
+		where t.activity_id = #{planId}
+		and t.status = 'Y'
+		order by t.id desc
+	</select>
 
     <select id="getWxUserInfoById" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
             resultType="java.lang.Integer">
@@ -42,9 +58,9 @@
 
 	<insert id="creatWxUserInfo" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
 		INSERT INTO market.market_wx_user_info
-			(ID,OPEN_ID,NICK_NAME,AVATAR_URL,ACTIVITY_ID,STATUS,IS_TRANSMIT)
+			(ID,OPEN_ID,NICK_NAME,AVATAR_URL,ACTIVITY_ID,STATUS,IS_TRANSMIT, CREATE_TIME)
 		VALUES
-			(MARKET.MARKET_SEQ_WX_USER_INFO.nextval,#{openId},#{nickName},#{avatarUrl},#{activityId},#{status},#{isTransmit})
+			(MARKET.MARKET_SEQ_WX_USER_INFO.nextval,#{openId},#{nickName},#{avatarUrl},#{activityId},#{status},#{isTransmit},#{createTime})
 	</insert>
 
 	<select id="getPlanActivityList" parameterType="java.lang.String"
@@ -92,30 +108,61 @@
 
 	<select id="findUserInfoStatus" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
 			resultType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
-		select t.is_transmit isTransmit,t.status
+		select t.id, t.open_id openId, t.is_transmit isTransmit, t.status,t.create_time createTime
 		  from market.market_wx_user_info t
 		  left join market.market_tb_plan_activity p on p.id = t.activity_id
-		 where t.open_id = #{openId} and t.activity_id = #{activityId}
+		  left join market.market_tb_terminal_total tt on tt.plan_id=p.plan_id
+		 where t.open_id=#{openId} and tt.brand=#{brand} AND substr(t.create_time,0, 4) like '%${createTime}%'
+		order by t.id desc
 	</select>
 
-	<select id="findUserInfoStatus1" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
-			resultType="java.lang.String">
-		select t.status
+	<select id="findUserInfoStatusByOpenId" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
+			resultType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
+		select t.id, t.open_id openId, t.is_transmit isTransmit, t.status,t.create_time createTime
 		from market.market_wx_user_info t
 		left join market.market_tb_plan_activity p on p.id = t.activity_id
-		where t.open_id = #{openId} and t.activity_id = #{activityId}
+		left join market.market_tb_terminal_total tt on tt.plan_id=p.plan_id
+		where t.open_id=#{openId} AND substr(t.create_time,0, 4) like '%${createTime}%' AND t.activity_id = #{activityId}
+		order by t.id desc
 	</select>
-
 
 	<update id="updateUserInfoStatus" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
 		update market.market_wx_user_info t
 		set t.status='Y'
-		where t.open_id=#{openId} and t.activity_id=#{activityId}
+		where t.open_id=#{openId} and t.activity_id=#{activityId} AND t.id = #{id}
 	</update>
 
 	<update id="updateUserInfoStatus1" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
 		update market.market_wx_user_info t
-		set t.status='Y',t.is_transmit='Y'
-		where t.open_id=#{openId} and t.activity_id=#{activityId}
+		set t.status='N'
+		where t.open_id=#{openId} and t.activity_id=#{activityId} AND t.id = #{id}
 	</update>
+	
+	<select id="getOpeIdAndactivityId" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
+			resultType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
+		select *
+		from (select row_.*, rownum rownum_
+		from (select t.activity_id, t.open_id
+		from market.market_wx_user_info t
+		left join market.market_tb_plan_activity p on t.activity_id = p.id
+		where t.activity_id in (5161)
+		group by t.open_id, t.activity_id
+		having count(t.open_id) >= 2) row_
+		where rownum &lt;= 2)
+		where rownum_ &gt; 0
+	</select>
+
+	<select id="getWxUserInfoList" resultType="com.cxg.weChat.crm.pojo.WxUserInfoDo">
+		select t.OPEN_ID openId,
+		t.NICK_NAME nickName,
+		t.AVATAR_URL avatarUrl,
+		t.ACTIVITY_ID activityId,
+		t.STATUS status,
+		t.IS_TRANSMIT isTransmit,
+		t.CREATE_TIME createTime
+		from market.market_wx_user_info t
+		where t.status = 'Y'
+		and t.activity_id = 5179
+		and rownum &lt;= 600
+	</select>
 </mapper>

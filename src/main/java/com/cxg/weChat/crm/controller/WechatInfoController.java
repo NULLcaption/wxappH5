@@ -3,10 +3,15 @@ package com.cxg.weChat.crm.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cxg.weChat.core.config.Constant;
+import com.cxg.weChat.core.config.JsonResponse;
 import com.cxg.weChat.core.utils.HttpUtil;
 import com.cxg.weChat.core.utils.RandomStr;
 import com.cxg.weChat.core.utils.Sha1;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import me.chanjar.weixin.common.error.WxErrorException;
+import me.chanjar.weixin.mp.api.WxMpService;
+import me.chanjar.weixin.open.api.WxOpenConfigStorage;
+import me.chanjar.weixin.open.api.WxOpenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,18 +43,81 @@ public class WechatInfoController {
     @Autowired
     ValueOperations<String, Object> valueOperations;
 
+    @Autowired
+    private WxOpenService wxOpenService;
+
+
     /**jsapi_ticket*/
     private static String jsapiTicket;
     /**jsapi_ticket过期时间*/
     private static long jsapiTicketExpires;
 
+    @GetMapping("/test")
+    public String test(){
+        return "mecoIndex";
+    }
+
     /**
-     * 香飘飘新品测试H5首页
+     * 获取componentAccessToken
+     *
      * @return
      */
-    @GetMapping("/xppTest")
-    public String xppNewProductTest(){
-        return "mecoIndex";
+    @ResponseBody
+    @GetMapping("/open/{componentAppId}")
+    public JsonResponse componentAccessToken(@PathVariable("componentAppId") String componentAppId){
+        HashMap<String, String> result = new HashMap<>();
+        WxOpenConfigStorage wxOpenConfigStorage = wxOpenService.getWxOpenConfigStorage();
+        if(!wxOpenConfigStorage.getComponentAppId().equals(componentAppId)){
+            return JsonResponse.fail("参数错误");
+        }
+        String expireKey = "wechat_component_access_token:" + componentAppId;
+        long expireIn = redisTemplate.getExpire(expireKey);
+        // 过期时间小于60秒，强制刷新
+        boolean forceRefresh = expireIn < 60;
+        try {
+            result.put("componentAppId", componentAppId);
+            result.put("componentAccessToken", wxOpenService.getWxOpenComponentService().getComponentAccessToken(forceRefresh));
+            // 强制刷新后，更新过期时间
+            if(forceRefresh){
+                expireIn = redisTemplate.getExpire(expireKey);
+            }
+            result.put("expireIn", String.valueOf(expireIn));
+        } catch (WxErrorException e) {
+            e.printStackTrace();
+            return JsonResponse.fail("参数错误");
+        }
+        return JsonResponse.success(result);
+    }
+
+    /**
+     * 查看应用
+     * @param mpId
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/mp/{mpId}")
+    public JsonResponse mpInfo(@PathVariable("mpId") String mpId){
+        WxMpService wxMpService = wxOpenService.getWxOpenComponentService().getWxMpServiceByAppid(mpId);
+        HashMap<String, String> result = new HashMap<>();
+        String componentAppId = wxOpenService.getWxOpenConfigStorage().getComponentAppId();
+        String expireKey = "wechat_authorizer_access_token:" + componentAppId + ":" + mpId;
+        long expireIn = redisTemplate.getExpire(expireKey);
+        // 过期时间小于60秒，强制刷新
+        boolean forceRefresh = expireIn < 60;
+        try {
+            result.put("mpId", mpId);
+            result.put("accessToken", wxMpService.getAccessToken(forceRefresh));
+            result.put("jsapiTicket", wxMpService.getJsapiTicket(forceRefresh));
+            // 强制刷新后，更新过期时间
+            if(forceRefresh){
+                expireIn = redisTemplate.getExpire(expireKey);
+            }
+            result.put("expireIn", String.valueOf(expireIn));
+        } catch (WxErrorException e) {
+            e.printStackTrace();
+            return JsonResponse.fail("应用不存在");
+        }
+        return JsonResponse.success(result);
     }
 
     /**
@@ -76,7 +144,7 @@ public class WechatInfoController {
         String signature = Sha1.encode(str);
         logger.debug("signature:" + signature);
 
-        configValue.put("appId",Constant.M_APP_ID);
+        configValue.put("appId",Constant.X_APP_ID);
         configValue.put("signature", signature);
         configValue.put("nonceStr", nonceStr);
         configValue.put("timestamp", timestamp);

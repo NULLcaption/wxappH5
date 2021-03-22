@@ -88,6 +88,18 @@ function load() {
                     title: '活动结束时间'
                 },
                 {
+                    field: 'brand',
+                    title: '活动品牌'
+                },
+                {
+                    field: 'matnr02',
+                    title: '活动系列'
+                },
+                {
+                    field: 'matnr',
+                    title: '活动产品'
+                },
+                {
                     field: 'openId',
                     title: 'openId'
                 },
@@ -111,8 +123,8 @@ function load() {
                     title: '是否状态'
                 },
                 {
-                    field: 'isTransmit',
-                    title: '是否转发'
+                    field: 'createTime',
+                    title: '领取时间'
                 }
             ]
         });
@@ -139,7 +151,16 @@ function clearData() {
  * 导出数据
  */
 function downloadData() {
-    window.open(prefix + '/downloadData?planId=' + $('#planId').val() + '&id=' + $('#id').val()
+    if ($('#planId').val()==''
+        || $('#id').val()==''
+        || $('#planTitle').val()==''
+        || $('#planAddress').val()==''
+        || $('#status').val()==''
+        || $('#planStartDate').val()==''
+        || $('#planEndDate').val()=='') {
+        layer.msg("请选择筛选条件！不然程序员要背锅！")
+    }
+    window.open(prefix + '/downloadExcel?planId=' + $('#planId').val() + '&id=' + $('#id').val()
     + '&planTitle=' + $('#planTitle').val() + '&planAddress=' + $('#planAddress').val() + '&status=' + $('#status').val()
     + '&planStartDate=' + $('#planStartDate').val() + '&planEndDate=' + $('#planEndDate').val());
 }

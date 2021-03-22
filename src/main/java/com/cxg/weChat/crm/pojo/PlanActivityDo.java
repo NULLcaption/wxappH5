@@ -32,6 +32,51 @@ public class PlanActivityDo implements Serializable {
 	private String NickName;
 	private String openId;
 	private String isTransmit;
+	private String createTime;
+	private String planNum;
+	private String brand;
+	private String matnr02;
+	private String matnr;
+
+	public String getMatnr02() {
+		return matnr02;
+	}
+
+	public void setMatnr02(String matnr02) {
+		this.matnr02 = matnr02;
+	}
+
+	public String getMatnr() {
+		return matnr;
+	}
+
+	public void setMatnr(String matnr) {
+		this.matnr = matnr;
+	}
+
+	public String getBrand() {
+		return brand;
+	}
+
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
+
+	public String getPlanNum() {
+		return planNum;
+	}
+
+	public void setPlanNum(String planNum) {
+		this.planNum = planNum;
+	}
+
+	public String getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
 
 	public String getIsTransmit() {
 		return isTransmit;

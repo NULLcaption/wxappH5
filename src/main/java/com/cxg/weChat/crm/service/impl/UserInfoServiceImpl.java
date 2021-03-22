@@ -145,4 +145,44 @@ public class UserInfoServiceImpl implements UserInfoService {
         return null;
     }
 
+    @Override
+    public List<WxUserInfoDo> getOpeIdAndactivityId() {
+        try {
+            return userInfoMapper.getOpeIdAndactivityId();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public List<WxUserInfoDo> getWxUserInfoList() {
+        try {
+            return userInfoMapper.getWxUserInfoList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public int getUserInfoCountByPlanId(String planId) {
+        try {
+            return userInfoMapper.getUserInfoCountByPlanId(planId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public List<WxUserInfoDo> findUserInfoStatusByOpenId(WxUserInfoDo wxUserInfoDo) {
+        try {
+            return userInfoMapper.findUserInfoStatusByOpenId(wxUserInfoDo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }

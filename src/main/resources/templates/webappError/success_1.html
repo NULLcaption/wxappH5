@@ -35,31 +35,31 @@
 <body>
 <div class="main" id="poster-container">
     <div class="poster-container ">
-        <div class="row" style="background-color: #F2BB89">
-            <div class="col-xs-3" style="padding-top: 3%">
-                <div class="container" style="padding-left: 20%">
+        <div class="row">
+            <div class="col-xs-4" style="padding-top: 7%">
+                <div class="container" style="padding-left: 30%">
                     <div class="poster-qrcode" style="padding-right: 50%"></div>
                 </div>
-                <div style="color: #fe2439;padding-left: 23%">
+                <div style="color: #8a1f11;padding-left: 43%">
                     <p style="margin: 0 0 0;">长按识别</p>
                 </div>
             </div>
-            <div class="col-xs-9" style="padding-top: 5%">
-                <div class="text-center" style="color: #fe2439">
-                    活动抽奖码:<label th:text="${planActivityDo.openId}"></label>
+            <div class="col-xs-8" style="padding-top: 10%">
+                <div class="text-left" style="color: #8a1f11">
+                    <label>活动抽奖码:</label><label th:text="${planActivityDo.openId}"></label>
                 </div>
-                <div class="text-center">
+                <div class="text-left" style="color: #8a1f11">
                     <label th:text="${planActivityDo.planAddress}"></label>
                 </div>
-                <div class="text-center">
-                    <address style="color: #8a1f11; margin: 0 0 0">
+                <div class="text-left">
+                    <label style="color: #8a1f11; margin: 0 0 0">
                         <span th:text="${planActivityDo.planStartDate}"></span>
-                        到
+                        -
                         <span th:text="${planActivityDo.planEndDate}"></span>
-                    </address>
+                    </label>
                 </div>
             </div>
-            <div style="padding-top: 30%"></div>
+            <div style="padding-top: 40%"></div>
         </div>
     </div>
 </div>
@@ -85,11 +85,11 @@
             mSize: 20,
             //label: '文字Logo',//使用文字logo必须去掉mode,mSize参数
             image: $(".poster-qrcode-logo")[0],
-            text: window.location.href,
+            text: 'https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MjM5OTE1OTE1Mg==&scene=124#wechat_redirect',
             size: 1080 / 3,
             render: 'canvas',
-            width: 60,
-            height: 60
+            width: 80,
+            height: 80
         });
         createPoster();
     });
@@ -103,7 +103,7 @@
         var width = $('.main').width(); //获取dom 宽度
         var height = $('.main').height(); //获取dom 高度
         var canvas = document.createElement("canvas"); //创建一个canvas节点
-        var scale = 1; //定义任意放大倍数 支持小数
+        var scale = 5; //定义任意放大倍数 支持小数
         canvas.width = width * scale; //定义canvas 宽度 * 缩放
         canvas.height = height * scale; //定义canvas高度 *缩放
         //当前滚动条的位置

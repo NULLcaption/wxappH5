@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head lang="en">
+    <meta charset="UTF-8">
+    <script src="https://libs.baidu.com/jquery/1.7.0/jquery.min.js"></script>
+    <script src="/static/js/jquery.qrcode.min.js" th:src="@{/static/js/jquery.qrcode.min.js}"></script>
+    <script src="/static/js/html2canvas.min.js" th:src="@{/static/js/html2canvas.min.js}"></script>
+    <script src="/js/plugins/layer/layer.min.js" th:src="@{/js/plugins/layer/layer.min.js}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            window.location.href = "https://mp.weixin.qq.com/s/dvJ_U28Q9Kro1IOxC_Jnng"
+        })
+    </script>
+</head>
+<head th:include="include :: header"></head>
+<body>
+<div type="text" style="padding-left: 30%; padding-top: 40%">视频号分享页面正在加载中...请等待...</div>
+<div style="padding-left: 40%;">
+    <div type="button" class="btn btn-default">
+        <p><a href="https://mp.weixin.qq.com/s/dvJ_U28Q9Kro1IOxC_Jnng">点击刷新页面</a></p>
+    </div>
+</div>
+</body>
+</html>

@@ -96,7 +96,6 @@ public class WechatController {
      * @param signature
      * @param encType
      * @param msgSignature
-     * @return
      */
     @PostMapping("/auth")
     public String receiveTicket(@RequestBody(required = false) String requestBody,

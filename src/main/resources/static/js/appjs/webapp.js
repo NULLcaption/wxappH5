@@ -12,12 +12,6 @@ $().ready(function() {
     save();
 });
 
-$.validator.setDefaults({
-    submitHandler : function() {
-        save(1);
-    }
-});
-
 function createQRcode(qrcode) {
     layer.msg("请到现场管理管理员处扫码合核销");
     //生成二维码
@@ -35,23 +29,32 @@ function createQRcode(qrcode) {
 }
 /**
  * 确认领取
+ * 动态二维码长连接请求；
+ * 请求60S没有响应，则显示动态二维码过期，需要返回重新扫码进入；
  * @param status
  */
 function save() {
-    setInterval(function () {
-        $.ajax({
-            type : 'POST',
-            data : {
-                "id" : $("#id").val(),
-                "planId" : $("#planId").val(),
-                "openId" : $("#openId").val()
-            },
-            url : prefix + '/submit1',
-            success : function(r) {
-                if (r.code == 0) {
-                    window.location.href = prefix+"/success?id="+$("#id").val()+'&planId='+$("#planId").val()+'&openId='+$("#openId").val();
+    var num = 60;
+    var timer = setInterval(function () {
+        num --;
+        if (num <= 0) {
+            clearTimeout(timer);
+            window.location.href = prefix+"/timeout";
+        } else {
+            $.ajax({
+                type : 'POST',
+                data : {
+                    "id" : $("#id").val(),
+                    "planId" : $("#planId").val(),
+                    "openId" : $("#openId").val()
+                },
+                url : prefix + '/submit1',
+                success : function(r) {
+                    if (r.code == 0) {
+                        window.location.href = prefix+"/success?id="+$("#id").val()+'&planId='+$("#planId").val()+'&openId='+$("#openId").val();
+                    }
                 }
-            }
-        });
+            });
+        }
     },5000);
 }

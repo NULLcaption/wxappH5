@@ -21,6 +21,15 @@ public class WxUserInfoDo implements Serializable{
     private String isTransmit;
     private String createTime;
     private String brand;
+    private String matnr02;
+
+    public String getMatnr02() {
+        return matnr02;
+    }
+
+    public void setMatnr02(String matnr02) {
+        this.matnr02 = matnr02;
+    }
 
     public String getBrand() {
         return brand;

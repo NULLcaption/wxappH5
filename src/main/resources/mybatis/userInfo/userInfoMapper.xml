@@ -113,6 +113,7 @@
 		  left join market.market_tb_plan_activity p on p.id = t.activity_id
 		  left join market.market_tb_terminal_total tt on tt.plan_id=p.plan_id
 		 where t.open_id=#{openId} and tt.brand=#{brand} AND substr(t.create_time,0, 4) like '%${createTime}%'
+		       AND p.matnr02=#{matnr02}
 		order by t.id desc
 	</select>
 

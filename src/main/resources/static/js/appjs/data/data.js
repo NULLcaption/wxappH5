@@ -150,17 +150,10 @@ function clearData() {
 /**
  * 导出数据
  */
-function downloadData() {
-    if ($('#planId').val()==''
-        || $('#id').val()==''
-        || $('#planTitle').val()==''
-        || $('#planAddress').val()==''
-        || $('#status').val()==''
-        || $('#planStartDate').val()==''
-        || $('#planEndDate').val()=='') {
-        layer.msg("请选择筛选条件！不然程序员要背锅！")
-    }
-    window.open(prefix + '/downloadExcel?planId=' + $('#planId').val() + '&id=' + $('#id').val()
-    + '&planTitle=' + $('#planTitle').val() + '&planAddress=' + $('#planAddress').val() + '&status=' + $('#status').val()
-    + '&planStartDate=' + $('#planStartDate').val() + '&planEndDate=' + $('#planEndDate').val());
-}
+//function downloadData() {
+//    if ($('#planId').val()=='') {
+//        layer.msg("请选择筛选条件！不然程序员要背锅！")
+//        return;
+//    }
+//    window.open(prefix + '/downloadExcel?planId=' + $('#planId').val());
+//}

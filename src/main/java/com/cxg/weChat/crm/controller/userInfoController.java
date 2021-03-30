@@ -92,7 +92,7 @@ public class userInfoController {
         PlanActivityDo planActivityDo = getPlanActivityData(id, planId);
         int count = userInfoService.getUserInfoCountByPlanId(id);
         //控制活动派样数量
-        if (count == Integer.parseInt(planActivityDo.getPlanNum())) {
+        if (count >= Integer.parseInt(planActivityDo.getPlanNum())) {
             return "webappError/startedDone";
         }
         //控制活动扫码时间
@@ -115,6 +115,7 @@ public class userInfoController {
         wxUserInfoDo.setPlanId(planId);
         wxUserInfoDo.setCreateTime(String.valueOf(LocalDate.now().getYear()));
         wxUserInfoDo.setBrand(planActivityDo.getBrand());
+        wxUserInfoDo.setMatnr02(planActivityDo.getMatnr02());
         //查询用户是否参加过之前的活动
         List<WxUserInfoDo> wxUserInfo = userInfoService.findUserInfoStatus(wxUserInfoDo);
         if (wxUserInfo !=null && !wxUserInfo.isEmpty()) {
@@ -300,18 +301,27 @@ public class userInfoController {
     public String successRed(String id,String planId, String openId, Model model) {
         //根据活动类型来处理不同的海报
         //获取活动数据
-        PlanActivityDo planActivityDo = getPlanActivityData(id, planId);
-        planActivityDo.setOpenId(openId.substring(8, 20));
-        model.addAttribute("planActivityDo", planActivityDo);
-        //校园活动
-        if ("1".equals(planActivityDo.getPlanStates())) {
-            return "webappError/success_4";
-        }
-        //快闪活动
-        if ("3".equals(planActivityDo.getPlanStates())) {
-            return "webappError/success_4";
-        }
+//        PlanActivityDo planActivityDo = getPlanActivityData(id, planId);
+//        planActivityDo.setOpenId(openId.substring(8, 20));
+//        model.addAttribute("planActivityDo", planActivityDo);
+//        //校园活动
+//        if ("1".equals(planActivityDo.getPlanStates())) {
+//            return "webappError/success_4";
+//        }
+//        //快闪活动
+//        if ("3".equals(planActivityDo.getPlanStates())) {
+//            return "webappError/success_4";
+//        }
         return "webappError/success";
+    }
+
+    /**
+     * 动态二维码请求超时60s后跳转至失效页面
+     * @return
+     */
+    @GetMapping("/timeout")
+    public String timeout() {
+        return "webappError/error_2";
     }
 
 }

@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.SimpleFormatter;
 
 
@@ -51,6 +53,8 @@ public class LoginController extends BaseController {
     private UserInfoService userInfoService;
     @Autowired
     private WxOpenService wxOpenService;
+    @Autowired
+    ValueOperations<String, Object> valueOperations;
 
     /**
      * @Description: 登录页面跳转链接
@@ -96,7 +100,7 @@ public class LoginController extends BaseController {
      * 由於緩存的access_token可能和传入的AppID不一致，导致用户在不同的公众号上的操作出现问题
      * @Author xg.chen
      * @Date 15:15 2019/10/24
-     **/
+     */
     public String getWxInfo(HttpSession session,
                             HttpServletResponse response,
                             HttpServletRequest request,
@@ -116,20 +120,26 @@ public class LoginController extends BaseController {
         //微信API服务开始
         WxOpenComponentService wxOpenComponentService = wxOpenService.getWxOpenComponentService();
         WxMpService wxMpService = wxOpenComponentService.getWxMpServiceByAppid(appid);
-        session.setAttribute("appId", appid);
 
         // 通过授权，获取用户基本信息
         if (null != code) {
-            //这里出现code重用的报错，解决的方案就是：
-            session.setAttribute("code", code);
             //1.先session中获取access_token
             session = request.getSession();
             WxMpOAuth2AccessToken wxMpOAuth2AccessToken = (WxMpOAuth2AccessToken) session.getAttribute("wxMpOAuth2AccessToken");
             //2.如果session中没有则用code获取access_token
             if (null == wxMpOAuth2AccessToken) {
-                // 获取用户信息
-                logger.debug("appid=======>>"+appid);
-                wxMpOAuth2AccessToken = wxOpenComponentService.oauth2getAccessToken(appid, code);
+                //先在redis中获取code
+                String redis_code = (String) valueOperations.get("open_wechat_code_"+code);
+                if ("".equals(redis_code)){
+                    //如果redis code为空则使用code请求，并将code缓存至redis中
+                    logger.debug("code=======>>" + code);
+                    valueOperations.set("open_wechat_code_" + code, code, Constant.KEY_TIME_CODE, TimeUnit.SECONDS);
+                    wxMpOAuth2AccessToken = wxOpenComponentService.oauth2getAccessToken(appid, code);
+                } else {
+                    //redis code不为空，则使用redis_code授权
+                    logger.debug("redis_code=======>>" + redis_code);
+                    wxMpOAuth2AccessToken = wxOpenComponentService.oauth2getAccessToken(appid, redis_code);
+                }
                 // 将获取到的access_token放在缓存里
                 session.setAttribute("access_token", wxMpOAuth2AccessToken.getAccessToken());
                 session.setAttribute("wxMpOAuth2AccessToken", wxMpOAuth2AccessToken);
@@ -145,11 +155,9 @@ public class LoginController extends BaseController {
                 session.setAttribute("openId", wxMpUser.getOpenId());
                 //将微信用户保存至数据库
                 createWxuserInfo(wxMpUser, id);
-                logger.error(Constant.URL + "/api/userInfo/admin/webappIndex/" + parm);
                 // 跳转到活动页面
                 response.sendRedirect(Constant.URL + "/api/userInfo/admin/webappIndex/" + parm);
-        } else {//用户未关注
-                logger.debug("------------>用户未关注");
+            } else {//用户未关注
                 response.sendRedirect(Constant.URL + "/api/userInfo/admin/notConcern/" + parm);
             }
             return null;
@@ -169,6 +177,7 @@ public class LoginController extends BaseController {
 
     /**
      * 将微信微信用户保存到数据库
+     *
      * @param wxMpUser
      * @param id
      */
@@ -186,7 +195,7 @@ public class LoginController extends BaseController {
         wxUserInfoDo.setCreateTime(formatter.format(date));
         //先根据openId检查是否存在该用户
         int num = userInfoService.getWxUserInfoById(wxUserInfoDo);
-        logger.debug("openId检查是否存在该用户==>"+num);
+        logger.debug("openId检查是否存在该用户==>" + num);
         //没有的话就插入
         if (num == 0) {
             PoolSend poolSend = new PoolSend();

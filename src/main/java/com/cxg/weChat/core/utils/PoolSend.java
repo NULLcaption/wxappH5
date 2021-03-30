@@ -1,5 +1,8 @@
 package com.cxg.weChat.core.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.*;
 /**
  * @Description 创建换多线程缓存池
@@ -7,6 +10,7 @@ import java.util.concurrent.*;
  * @Date 13:28 2019/10/24
  **/
 public class PoolSend {
+    private static Logger logger = LoggerFactory.getLogger(PoolSend.class);
     BlockingQueue<Runnable> workQueue;//任务队列
     ExecutorService executorService;//线程池接口
 
@@ -19,11 +23,12 @@ public class PoolSend {
     }
     //将任务放到线程池中
     public void send(Runnable task){
-        System.out.println("Pool Send sending mail...");
+        logger.debug("Pool Send sending mail...");
         executorService.execute(task);
     }
     //关闭线程池
     public void close(){
+        logger.debug("Pool Send close mail...");
         executorService.shutdown();
     }
 }

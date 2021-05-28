@@ -64,6 +64,8 @@ public class userInfoController {
     @Autowired
     ValueOperations<String, Object> valueOperations;
 
+    private static Integer CODE_NUMBER = 0;
+
     /**
      * @Description H5推广小程序页面
      * @Author xg.chen
@@ -120,24 +122,39 @@ public class userInfoController {
         List<WxUserInfoDo> wxUserInfo = userInfoService.findUserInfoStatus(wxUserInfoDo);
         if (wxUserInfo !=null && !wxUserInfo.isEmpty()) {
             //是否参加
+            for (WxUserInfoDo wxUserInfoDo1 : wxUserInfo) {
+                if(wxUserInfoDo1.getStatus().equals("Y")){
+                    return "webappError/error";
+                }
+            }
             if (wxUserInfo.get(0).getStatus().equals("N")) {
                 if (planActivityDo != null) {
                     String[] string = planActivityDo.getPlanPhotoUrl().split(",");
                     planActivityDo.setPlanPhotoUrl(string[0]);
                 }
-                planActivityDo.setOpenId(openId);
-                model.addAttribute("planActivityDo", planActivityDo);
+                //MECO展示页面
                 if ("G".equals(planActivityDo.getBrand())){
+                    //当前活动参与人数作为用户的参与码
+                    //防止用户刷新时数据变化，实际展示的数据和参与码数据不符合
+                    int codeNum = userInfoService.getUserInfoCount(id);
+                    planActivityDo.setCodeNumber(String.valueOf(codeNum));
+                    planActivityDo.setCreateTime(wxUserInfo.get(0).getCreateTime());
+                    planActivityDo.setOpenId(openId);
+                    model.addAttribute("planActivityDo", planActivityDo);
                     return "webappIndex";
                 }
+                //兰芳园展示页面
                 if ("L".equals(planActivityDo.getBrand())){
+                    planActivityDo.setOpenId(openId);
+                    model.addAttribute("planActivityDo", planActivityDo);
                     return "webappIndex_l";
                 }
+                //香飘飘展示页面
                 if ("X".equals(planActivityDo.getBrand())){
+                    planActivityDo.setOpenId(openId);
+                    model.addAttribute("planActivityDo", planActivityDo);
                     return "webappIndex_x";
                 }
-            } else {
-                return "webappError/error";
             }
         }
         return "webappError/error";
@@ -300,18 +317,6 @@ public class userInfoController {
     @GetMapping("/success")
     public String successRed(String id,String planId, String openId, Model model) {
         //根据活动类型来处理不同的海报
-        //获取活动数据
-//        PlanActivityDo planActivityDo = getPlanActivityData(id, planId);
-//        planActivityDo.setOpenId(openId.substring(8, 20));
-//        model.addAttribute("planActivityDo", planActivityDo);
-//        //校园活动
-//        if ("1".equals(planActivityDo.getPlanStates())) {
-//            return "webappError/success_4";
-//        }
-//        //快闪活动
-//        if ("3".equals(planActivityDo.getPlanStates())) {
-//            return "webappError/success_4";
-//        }
         return "webappError/success";
     }
 

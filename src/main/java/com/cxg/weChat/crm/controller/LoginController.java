@@ -130,7 +130,7 @@ public class LoginController extends BaseController {
             if (null == wxMpOAuth2AccessToken) {
                 //先在redis中获取code
                 String redis_code = (String) valueOperations.get("open_wechat_code_"+code);
-                if ("".equals(redis_code)){
+                if (StringUtils.isEmpty(redis_code)){
                     //如果redis code为空则使用code请求，并将code缓存至redis中
                     logger.debug("code=======>>" + code);
                     valueOperations.set("open_wechat_code_" + code, code, Constant.KEY_TIME_CODE, TimeUnit.SECONDS);
@@ -138,7 +138,15 @@ public class LoginController extends BaseController {
                 } else {
                     //redis code不为空，则使用redis_code授权
                     logger.debug("redis_code=======>>" + redis_code);
-                    wxMpOAuth2AccessToken = wxOpenComponentService.oauth2getAccessToken(appid, redis_code);
+                    // 重新进行授权
+                    String scope = "snsapi_userinfo";
+                    String state = "";
+                    String callbackUrl = Constant.URL + "/login/" + activityId;
+                    if (null != redirect) {
+                        callbackUrl += "?redirect=" + redirect;
+                    }
+                    String url = wxOpenComponentService.oauth2buildAuthorizationUrl(appid, callbackUrl, scope, state);
+                    response.sendRedirect(url);
                 }
                 // 将获取到的access_token放在缓存里
                 session.setAttribute("access_token", wxMpOAuth2AccessToken.getAccessToken());
@@ -191,7 +199,7 @@ public class LoginController extends BaseController {
         wxUserInfoDo.setStatus("N");
         wxUserInfoDo.setIsTransmit("N");
         Date date = new Date();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         wxUserInfoDo.setCreateTime(formatter.format(date));
         //先根据openId检查是否存在该用户
         int num = userInfoService.getWxUserInfoById(wxUserInfoDo);
@@ -210,9 +218,11 @@ public class LoginController extends BaseController {
      * @CreateDate: 2018/11/13 14:17
      * @Version: 1.0
      */
-    @GetMapping("/login")
-    public String login() {
-        return "login";
+    @GetMapping("/index/{name}")
+    @ResponseBody
+    public String login(@PathVariable("name") String name) {
+        logger.debug("9300:{}", name);
+        return "9300:{}"+name;
     }
 
     /**

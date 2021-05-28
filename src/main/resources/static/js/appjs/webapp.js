@@ -3,17 +3,48 @@
  * Created by Administrator on 2019/3/13.
  */
 var prefix = "/api/userInfo/admin";
+/**
+ * 初始化页面
+ */
 $().ready(function() {
     var id = $("#id").val();
     var plan = $("#planId").val();
     var openid = $("#openId").val();
     var qrcode = id+","+plan+","+openid;
+    CurrentTime();
     createQRcode(qrcode);
     save();
 });
-
+/**
+ * 页面时间确认
+ * @constructor
+ */
+function CurrentTime() {
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    var hour = date.getHours();
+    var minute = date.getMinutes();
+    var second = date.getSeconds();
+    month = month < 10 ? ("0" + month) : month;
+    day = day < 10 ? ("0" + day) : day;
+    hour = hour < 10 ? ("0" + hour) : hour;
+    minute = minute < 10 ? ("0" + minute) : minute;
+    second = second < 10 ? ("0" + second) : second;
+    var Timer = year + '-' + month + '-' + day + ' ' + hour + ':' + minute + ':' + second;
+    //在页面上插入日期
+    $("#clock").html(Timer);
+    setTimeout(function () {
+        CurrentTime();
+    }, 1000);
+}
+/**
+ * 生成二维码
+ * @param qrcode
+ */
 function createQRcode(qrcode) {
-    layer.msg("请到现场管理管理员处扫码合核销");
+    layer.msg("请到现场管理管理员处进行合核销确认");
     //生成二维码
     $('.poster-qrcode').qrcode({
         mode: 4,
@@ -23,8 +54,8 @@ function createQRcode(qrcode) {
         text: qrcode,
         size: 1080 / 3,
         render: 'canvas',
-        width: 100,
-        height: 100
+        width: 150,
+        height: 150
     });
 }
 /**

@@ -1,6 +1,7 @@
 package com.cxg.weChat.crm.pojo;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
 * @Description:    推广活动实体类
@@ -37,6 +38,15 @@ public class PlanActivityDo implements Serializable {
 	private String brand;
 	private String matnr02;
 	private String matnr;
+	private String codeNumber;
+
+	public String getCodeNumber() {
+		return codeNumber;
+	}
+
+	public void setCodeNumber(String codeNumber) {
+		this.codeNumber = codeNumber;
+	}
 
 	public String getMatnr02() {
 		return matnr02;
@@ -228,6 +238,18 @@ public class PlanActivityDo implements Serializable {
 				", planExplain='" + planExplain + '\'' +
 				", planGetExplain='" + planGetExplain + '\'' +
 				", planQrcodeUrl='" + planQrcodeUrl + '\'' +
+				", urls=" + Arrays.toString(urls) +
+				", status='" + status + '\'' +
+				", avatarUrl='" + avatarUrl + '\'' +
+				", NickName='" + NickName + '\'' +
+				", openId='" + openId + '\'' +
+				", isTransmit='" + isTransmit + '\'' +
+				", createTime='" + createTime + '\'' +
+				", planNum='" + planNum + '\'' +
+				", brand='" + brand + '\'' +
+				", matnr02='" + matnr02 + '\'' +
+				", matnr='" + matnr + '\'' +
+				", codeNumber='" + codeNumber + '\'' +
 				'}';
 	}
 }

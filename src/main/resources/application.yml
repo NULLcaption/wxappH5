@@ -3,9 +3,11 @@ server:
   session-timeout: 2000
   port: 80
 logging:
+  path: logs
   level:
     root: info
     com.cxg.weChat: debug
+  config: classpath:logback-spring.xml
 bootdo:
   #  正式机路径
   uploadPath: /var/uploaded_files/

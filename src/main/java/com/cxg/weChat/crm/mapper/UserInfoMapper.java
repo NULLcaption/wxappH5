@@ -48,4 +48,6 @@ public interface UserInfoMapper {
     int getUserInfoCountByPlanId(String planId);
 
     List<WxUserInfoDo> findUserInfoStatusByOpenId(WxUserInfoDo wxUserInfoDo);
+
+    int getUserInfoCount(String id);
 }

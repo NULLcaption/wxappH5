@@ -34,31 +34,57 @@
                 <input id="id" name="id" type="hidden" th:value="${planActivityDo.id}">
                 <input id="planId" name="planId" type="hidden" th:value="${planActivityDo.planId}">
                 <input id="openId" name="openId" type="hidden" th:value="${planActivityDo.openId}">
-                <div>
-                    <div class="col-sm-12">
-                        <p><img class="img-responsive center-block" th:src="${planActivityDo.planPhotoUrl}" /></p>
-                    </div>
-                </div>
+                <!--<div style="padding-top: 5%">-->
+                <!--<div class="col-sm-12">-->
+                <!--<p><img class="img-responsive center-block" th:src="${planActivityDo.planPhotoUrl}" /></p>-->
+                <!--</div>-->
+                <!--</div>-->
                 <div class="container-fluid">
                     <div class="row-fluid">
                         <div class="span12">
-                            <blockquote style="margin: 0 0 0">
-                                <p style="color: #e28b41">
-                                    <span th:text="${planActivityDo.planTitle}"></span>
-                                </p>
-                                <small style="color: #030303">
+                            <blockquote style="margin: 0 0 0;font-size:150%;font-weight:bold;">
+                                <p style="color: #030303">
                                     <span th:text="${planActivityDo.planAddress}"></span>
-                                </small>
+                                </p>
                             </blockquote>
                         </div>
                         <div class="span12">
-                            <address style="color: #8a1f11; margin: 0 0 0">
+                            <address style="color: #8a1f11; margin: 0 0 0;font-size:110%;font-weight:bold;">
                                 <label class="col-sm-12 control-label">活动时间:</label>
                                 <span th:text="${planActivityDo.planStartDate}"></span>
                                 到
                                 <span th:text="${planActivityDo.planEndDate}"></span>
                             </address>
                         </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="col-sm-12" style="padding-top: 10%">
+                        <div class="text-center">
+                            <p style="margin: 0 0 0;font-size:150%;font-weight:bold;">活动参与凭证码
+                                <span th:text="${planActivityDo.codeNumber}"></span>号
+                            </p>
+                        </div>
+                        <div class="text-center">
+                            <span style="margin: 0 0 0;font-size:200%;font-weight:bold;" th:text="${planActivityDo.createTime}"></span>
+                            <!--<span style="margin: 0 0 0;font-size:200%;font-weight:bold;" id="clock"></span>-->
+                        </div>
+                        <div class="caption" style="padding-left: 20%">
+                            <div class="container" style="padding-left: 15%">
+                                <div class="poster-qrcode" style="padding-right: 50%"></div>
+                            </div>
+                            <div style="color: #8a1f11;padding-left: 43%">
+                                <p style="margin: 0 0 0;"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding-top: 5%">
+                    <div class="text-center">
+                        <p style="margin: 0 0 0;font-size:150%;font-weight:bold;">点击识别下方二维码分享视频号</p>
+                    </div>
+                    <div class="col-sm-12">
+                        <p><img class="img-responsive center-block" src="https://meco-1259435766.cos.ap-shanghai.myqcloud.com/meco/wx_qr_code.png" /></p>
                     </div>
                 </div>
                 <div class="panel panel-default" style="margin-bottom: 0;padding-left: 15px;panel-heading:#FFFFFF !important; border-color: #FFFFFF;">
@@ -74,22 +100,9 @@
                     <div class="panel-body">
                         <span th:text="${planActivityDo.planGetExplain}"></span>
                     </div>
-                    <div class="panel-heading">
-                        <h4 class="panel-title" style="color: #030303;">转发链接</h4>
-                    </div>
-                    <div class="panel-body">
-                        <a href="https://mp.weixin.qq.com/s/5a5M1rCX6oWEBgefW88pVw">点击此处，转发链接至朋友圈>>></a>
-                    </div>
                 </div>
-                <div class="text-center" style="color: #fe2439">
-                    <p style="margin: 0 0 0;">请到现场管理员处扫码核销</p>
-                </div>
-                <div class="caption" style="padding-left: 10%">
-                    <div class="container" style="padding-left: 30%">
-                        <div class="poster-qrcode" style="padding-right: 50%"></div>
-                    </div>
-                    <div style="color: #8a1f11;padding-left: 43%">
-                        <p style="margin: 0 0 0;"></p>
+                <div style="padding-top: 20%">
+                    <div class="col-sm-12">
                     </div>
                 </div>
             </div>

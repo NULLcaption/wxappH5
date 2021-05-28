@@ -49,7 +49,17 @@
 		order by t.id desc
 	</select>
 
-    <select id="getWxUserInfoById" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
+	<select id="getUserInfoCount" parameterType="java.lang.String"
+			resultType="java.lang.Integer">
+		select count(distinct(t.open_id))
+		from market.market_wx_user_info t
+		left join market.market_tb_plan_activity p on p.id = t.activity_id
+		where t.activity_id = #{id}
+		order by t.id desc
+	</select>
+
+
+	<select id="getWxUserInfoById" parameterType="com.cxg.weChat.crm.pojo.WxUserInfoDo"
             resultType="java.lang.Integer">
 		select count(*)
 		from market.market_wx_user_info t
@@ -66,8 +76,8 @@
 	<select id="getPlanActivityList" parameterType="java.lang.String"
 			resultType="com.cxg.weChat.crm.pojo.PlanActivityDo">
 		select case (t.status)
-                 when 'N' then '未参加'
-                 when 'Y' then '已参加'
+                 when 'N' then '未核销'
+                 when 'Y' then '已核销'
   		        		 end status,
 			   t.avatar_url avatarUrl,
 			   p.plan_title planTitle,
@@ -92,8 +102,8 @@
 	<select id="getUserInfoByPlanId" parameterType="java.lang.String"
 			resultType="com.cxg.weChat.crm.pojo.PlanActivityDo">
 		select case (t.status)
-                 when 'N' then '未领取'
-                 when 'Y' then '已领取'
+                 when 'N' then '未核销'
+                 when 'Y' then '已核销'
   		        		 end status,
   		       case (t.is_transmit)
                  when 'N' then '未转发'

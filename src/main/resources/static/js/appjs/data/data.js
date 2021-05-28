@@ -120,7 +120,7 @@ function load() {
                 },
                 {
                     field: 'status',
-                    title: '是否状态'
+                    title: '是否核销'
                 },
                 {
                     field: 'createTime',

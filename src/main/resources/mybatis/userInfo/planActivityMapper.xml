@@ -59,7 +59,7 @@
         from market.market_wx_user_info t
         left join market.market_tb_plan_activity p on t.activity_id = p.id
         <where>
-            t.status = 'Y'
+            p.plan_id is not null
             <if test="planId != null and planId != ''">and p.plan_id = #{planId}</if>
             <if test="id != null and id != ''">and p.id = #{id}</if>
             <if test="planTitle != null and planTitle != ''">and p.plan_title LIKE '%${planTitle}%'</if>
@@ -87,9 +87,9 @@
         t.avatar_url avatarUrl,
         case (t.status)
         when 'N' then
-        '未参加'
+        '未核销'
         when 'Y' then
-        '已参加'
+        '已核销'
         end status,
         case (tt.brand)
         when 'X' then
@@ -109,7 +109,7 @@
         left join (select distinct(t.matnr02),t.maktx02 from basis.basis_tb_materiel t) m on p.matnr02 = m.matnr02
         left join basis.basis_tb_materiel mm on mm.matnr=p.matnr
         <where>
-            t.status = 'Y'
+            p.plan_id is not null
             <if test="planId != null and planId != ''">and p.plan_id = #{planId}</if>
             <if test="id != null and id != ''">and p.id = #{id}</if>
             <if test="planTitle != null and planTitle != ''">and p.plan_title LIKE '%${planTitle}%'</if>
@@ -117,8 +117,8 @@
             <if test="planStartDate != null and planStartDate != ''">and p.plan_start_date &gt;= #{planStartDate}</if>
             <if test="planEndDate != null and planEndDate != ''">and p.plan_start_date &lt;=  #{planStartDate}</if>
             <if test="status == null and status == ''">and t.status = 'Y'</if>
-            <if test="status == '已参加'">and t.status = 'Y'</if>
-            <if test="status == '未参加'">and t.status = 'N'</if>
+            <if test="status == '已核销'">and t.status = 'Y'</if>
+            <if test="status == '未核销'">and t.status = 'N'</if>
         </where>
         <choose>
             <when test="sort != null and sort.trim() != ''">
@@ -138,7 +138,7 @@
         from market.market_wx_user_info t
         left join market.market_tb_plan_activity p on t.activity_id = p.id
         <where>
-            t.status = 'Y'
+            p.plan_id is not null
             <if test="planId != null and planId != ''">and p.plan_id = #{planId}</if>
             <if test="id != null and id != ''">and p.id = #{id}</if>
             <if test="planTitle != null and planTitle != ''">and p.plan_title LIKE '%${planTitle}%'</if>
@@ -146,8 +146,8 @@
             <if test="planStartDate != null and planStartDate != ''">and p.plan_start_date &gt;= #{planStartDate}</if>
             <if test="planEndDate != null and planEndDate != ''">and p.plan_start_date &lt;=  #{planStartDate}</if>
             <if test="status == null and status == ''">and t.status = 'Y')</if>
-            <if test="status == '已参加'">and t.status = 'Y'</if>
-            <if test="status == '未参加'">and t.status = 'N'</if>
+            <if test="status == '已核销'">and t.status = 'Y'</if>
+            <if test="status == '未核销'">and t.status = 'N'</if>
         </where>
     </select>
 

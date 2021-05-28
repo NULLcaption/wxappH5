@@ -185,4 +185,14 @@ public class UserInfoServiceImpl implements UserInfoService {
         return null;
     }
 
+    @Override
+    public int getUserInfoCount(String id) {
+        try {
+            return userInfoMapper.getUserInfoCount(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
 }
